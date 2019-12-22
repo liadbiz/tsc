@@ -22,7 +22,7 @@ from pprint import pprint
 
 logger = logging.getLogger('TSC')
 logger.setLevel(logging.INFO)
-fh = logging.FileHandler('./logs/tsc.log', mode='w')
+fh = logging.FileHandler('./results/log.txt', mode='w')
 sh = logging.StreamHandler()
 fh.setLevel(logging.INFO)
 sh.setLevel(logging.INFO)

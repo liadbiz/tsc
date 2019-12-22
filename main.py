@@ -20,21 +20,6 @@ import logging
 from pprint import pprint
 
 
-logger = logging.getLogger('TSC')
-logger.setLevel(logging.INFO)
-fh = logging.FileHandler('./results/log.txt', mode='w')
-sh = logging.StreamHandler()
-fh.setLevel(logging.INFO)
-sh.setLevel(logging.INFO)
-fmt = '%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s'
-formatter = logging.Formatter(fmt)
-fh.setFormatter(formatter)
-sh.setFormatter(formatter)
-logger.addHandler(fh)
-logger.addHandler(sh)
-
-#logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
-
 # train model from scratch
 def train_scratch():
     optimizer = keras.optimizers.Adam(learning_rate=opt.train.lr)

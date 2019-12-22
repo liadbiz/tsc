@@ -20,6 +20,20 @@ import logging
 from pprint import pprint
 
 
+# logger config
+logger = logging.getLogger('TSC')
+logger.setLevel(logging.INFO)
+fh = logging.FileHandler('./results/log.txt', mode='w')
+sh = logging.StreamHandler()
+fh.setLevel(logging.INFO)
+sh.setLevel(logging.INFO)
+fmt = '%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s'
+formatter = logging.Formatter(fmt)
+fh.setFormatter(formatter)
+sh.setFormatter(formatter)
+logger.addHandler(fh)
+logger.addHandler(sh)
+
 # train model from scratch
 def train_scratch():
     optimizer = keras.optimizers.Adam(learning_rate=opt.train.lr)
@@ -45,29 +59,18 @@ def train_scratch():
         solver.fit(train_data=train_data, test_data=test_data, optimizer=optimizer, criterion=criterion,
                    lr_scheduler=lr_scheduler, train_metric=train_metric)
 
+
 # pre-train model for transfer learning
 def train_pre():
     pass
+
 
 # fine-tune model
 def train_transfer():
     pass
 
-def main():
-    # logger config
-    logger = logging.getLogger('TSC')
-    logger.setLevel(logging.INFO)
-    fh = logging.FileHandler('./logs/tsc.log', mode='w')
-    sh = logging.StreamHandler()
-    fh.setLevel(logging.INFO)
-    sh.setLevel(logging.INFO)
-    fmt = '%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s'
-    formatter = logging.Formatter(fmt)
-    fh.setFormatter(formatter)
-    sh.setFormatter(formatter)
-    logger.addHandler(fh)
-    logger.addHandler(sh)
 
+def main():
     logging.info('=======config info======')
     logging.info(pprint(opt))
     logging.info('======= end ======')

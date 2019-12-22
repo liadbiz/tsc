@@ -36,7 +36,7 @@ from sklearn.preprocessing import LabelEncoder
 
 def load_data(opt, dataset_name):
     # get train/test data
-    data_path = opt.dataset.dataset_path + 'UCR/' + dataset_name + '/'
+    data_path = opt.dataset.dataset_path + opt.dataset.archive_name + '/' + dataset_name + '/'
     x_train, y_train = readucr(data_path + dataset_name + '_TRAIN.txt')
     x_test, y_test = readucr(data_path + dataset_name + '_TEST.txt')
 

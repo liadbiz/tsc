@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow.keras as keras
 
-
+#######################Inception Model############################
 class ConvBNRelu(keras.layers.Layer):
     def __init__(self, channel, kernel_size=1, strides=1, padding='same'):
         super(ConvBNRelu, self).__init__(name='conv_block')
@@ -119,7 +119,6 @@ class TSCNet(keras.Model):
         for block_id in range(self.num_layers):
 
             for layer_id in range(2):
-                print('layer_id: ', layer_id)
                 if layer_id == 0:
                     out = InceptionBlk(self.out_channel, strides=1)(out)
                 else:
@@ -133,3 +132,15 @@ class TSCNet(keras.Model):
         out = self.fc(out)
 
         return out
+
+##########################Inception Model Done##############################
+
+#######################GRU Model############################
+#######################GRU Model Done############################
+
+#######################LSTM Model############################
+#######################LSTM Model Done############################
+
+#######################Transformer Model############################
+#######################Transformer Model Done############################
+

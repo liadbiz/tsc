@@ -28,12 +28,6 @@ import utils
 
 
 
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.preprocessing import LabelEncoder
-
-
 def load_data(opt, dataset_name):
     # get train/test data
     data_path = opt.dataset.dataset_path + opt.dataset.archive_name + '/' + dataset_name + '/'
@@ -41,12 +35,17 @@ def load_data(opt, dataset_name):
     x_test, y_test = readucr(data_path + dataset_name + '_TEST.txt')
 
     x_train, x_test = np.expand_dims(x_train, axis=3), np.expand_dims(x_test, axis=3)
+    input_shape = x_train.shape[1:]
+    num_classes = int(np.max(np.concatenate((y_train, y_test))))
+    y_train = tf.one_hot(y_train, depth=num_classes)
+    y_test = tf.one_hot(y_test, depth=num_classes)
     print(x_train.shape, y_train.shape)
     print(x_test.shape, y_test.shape)
-    data_train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(opt.train.batch_size)
-    data_test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(opt.train.batch_size)
-    input_shape = x_train.shape[1:]
-    num_classes = np.max(np.concatenate((y_train, y_test)))
+    data_train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(buffer_size=1000).batch(opt.train.batch_size)
+    data_test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).shuffle(buffer_size=1000).batch(opt.train.batch_size)
+
+    #print(y_train)
+    #return x_train, y_train, x_test, y_test, input_shape, num_classes
     return data_train, data_test, input_shape, num_classes
 
 
@@ -55,10 +54,10 @@ def check_if_file_exits(file_name):
 
 
 def readucr(filename):
-    data = np.loadtxt(filename).astype('float32')
+    data = np.loadtxt(filename)
     Y = data[:, 0]
     X = data[:, 1:]
-    return X, Y
+    return X.astype('float32'), Y.astype('int32')
 
 
 def readsits(filename):

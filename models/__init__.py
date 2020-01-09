@@ -1,19 +1,19 @@
 import tensorflow as tf
 import tensorflow.keras as keras
-
+import tensorflow.keras.regularizers as regularizers
 #######################Inception Model############################
 class ConvBNRelu(keras.layers.Layer):
     def __init__(self, channel, kernel_size=1, strides=1, padding='same'):
         super(ConvBNRelu, self).__init__(name='conv_block')
 
         self.model = keras.models.Sequential([
-            keras.layers.Conv1D(channel, kernel_size, strides=strides, padding=padding),
+            keras.layers.Conv1D(channel, kernel_size, strides=strides, padding=padding, kernel_regularizer=regularizers.l2(0.001)),
             keras.layers.BatchNormalization(),
             keras.layers.ReLU()
         ])
 
-    def call(self, x, training=None):
-        x = self.model(x, training=training)
+    def call(self, x):
+        x = self.model(x)
 
         return x
 
@@ -69,13 +69,13 @@ class ReductionBlk(keras.layers.Layer):
         self.channel = channel
         self.strides = strides
 
-        self.conv1_1 = ConvBNRelu(channel, kernel_size=3, strides=strides)
+        self.conv1_1 = ConvBNRelu(channel, kernel_size=3, strides=strides, padding='valid')
 
         self.conv2_1 = ConvBNRelu(channel, strides=1)
         self.conv2_2 = ConvBNRelu(channel, kernel_size=3, strides=1)
-        self.conv2_3 = ConvBNRelu(channel, kernel_size=3, strides=strides)
+        self.conv2_3 = ConvBNRelu(channel, kernel_size=3, strides=strides, padding='valid')
 
-        self.pool = keras.layers.MaxPooling1D(3, strides=strides, padding='same')
+        self.pool = keras.layers.MaxPooling1D(3, strides=strides, padding='valid')
 
 
     def call(self, x):
@@ -96,37 +96,43 @@ class ReductionBlk(keras.layers.Layer):
         return x
 
 class TSCNet(keras.Model):
-    def __init__(self, input_shape, num_classes, num_layers, init_channel=16, **kwargs):
+    def __init__(self, input_shape, num_classes, num_layers, bottleneck_channel=16, **kwargs):
         super(TSCNet, self).__init__(**kwargs)
-        self.in_channel = init_channel
-        self.out_channel = init_channel
+        self.bottleneck_channel = bottleneck_channel
         self.num_layers = num_layers
         #self.input_shape = input_shape
         self.num_classes = num_classes
-        self.init_channel = init_channel
 
-        self.conv1 = ConvBNRelu(init_channel)
-        #self.blocks = keras.models.Sequential()
 
+        self.conv1 = ConvBNRelu(bottleneck_channel, kernel_size=3, strides=1, padding='same')
+        self.conv2 = ConvBNRelu(bottleneck_channel, kernel_size=3, strides=2, padding='valid')
+        self.conv3 = ConvBNRelu(bottleneck_channel, kernel_size=3, strides=1, padding='same')
+        self.conv4 = ConvBNRelu(bottleneck_channel, kernel_size=3, strides=2, padding='valid')
+
+        self.blocks = keras.models.Sequential()
+
+        assert self.num_layers % 3 == 2
+        for block_id in range(1, self.num_layers + 1):
+
+            if block_id % 3 == 0:
+                block = ReductionBlk(self.bottleneck_channel, strides=2)
+            else:
+                block = InceptionBlk(self.bottleneck_channel, strides=1)
+            self.blocks.add(block)
+            # enlarger out_channels per block
+            # self.out_channel *= 2
 
 
         self.avg_pool = keras.layers.GlobalAveragePooling1D()
-        self.fc = keras.layers.Dense(num_classes)
+        self.fc = keras.layers.Dense(num_classes, activation='softmax')
 
     def call(self, x):
         out = self.conv1(x)
+        out = self.conv2(out)
+        out = self.conv3(out)
+        out = self.conv4(out)
 
-        for block_id in range(self.num_layers):
-
-            for layer_id in range(2):
-                if layer_id == 0:
-                    out = InceptionBlk(self.out_channel, strides=1)(out)
-                else:
-                    out = ReductionBlk(self.out_channel, strides=2)(out)
-
-            # enlarger out_channels per block
-            self.out_channel *= 2
-        #out = self.blocks(out)
+        out = self.blocks(out)
 
         out = self.avg_pool(out)
         out = self.fc(out)

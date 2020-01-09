@@ -19,35 +19,46 @@ import argparse
 import logging
 from pprint import pprint
 
+from sklearn.preprocessing import LabelBinarizer
 
 # logger config
 logger = logging.getLogger('TSC')
 logger.setLevel(logging.INFO)
-fh = logging.FileHandler('./results/log.txt', mode='w')
+#fh = logging.FileHandler('./results/log.txt', mode='w')
 sh = logging.StreamHandler()
-fh.setLevel(logging.INFO)
+#fh.setLevel(logging.INFO)
 sh.setLevel(logging.INFO)
 fmt = '%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s'
 formatter = logging.Formatter(fmt)
-fh.setFormatter(formatter)
+#fh.setFormatter(formatter)
 sh.setFormatter(formatter)
-logger.addHandler(fh)
+#logger.addHandler(fh)
 logger.addHandler(sh)
 
 # train model from scratch
 def train_scratch():
-    optimizer = keras.optimizers.Adam(learning_rate=opt.train.lr)
-    criterion = keras.losses.CategoricalCrossentropy(from_logits=True)
-    train_metric = keras.metrics.CategoricalAccuracy()
+    optimizer = getattr(keras.optimizers, opt.train.optimizer)(learning_rate=opt.train.lr)
+    criterion = keras.losses.CategoricalCrossentropy()
+    metric = keras.metrics.CategoricalAccuracy()
     # val_metric = keras.metrics.CategoricalAccuracy()
 
-    lr_scheduler = keras.callbacks.ReduceLROnPlateau(monitor=opt.train.monitor, factor=opt.train.factor,
-                                                     patience=opt.train.patience, min_lr=opt.train.min_lr)
-
+    lr_scheduler = keras.callbacks.ReduceLROnPlateau(monitor=opt.train.monitor, factor=opt.train.lr_factor,
+                                                     patience=opt.train.lr_patience, min_lr=opt.train.lr_min_lr,
+                                                     verbose=1)
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath='results/models/best_model.h5', save_best_only=False,
+                                                 monitor='val_loss', verbose=1)
+    tensorboard = keras.callbacks.TensorBoard(log_dir='results/tensorboard_logs', update_freq='epoch')
+    csv_logger =keras.callbacks.CSVLogger('results/logs/training.log')
+    early_stop = keras.callbacks.EarlyStopping(monitor=opt.train.monitor, min_delta=opt.train.stop_min_delta,
+                                               patience=opt.train.stop_patience, verbose=1,
+                                               restore_best_weights=True)
+    callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
     for dataset_name in opt.dataset.test_dataset_names:
         # get data
         logger.info('============loading data============')
         train_data, test_data, input_shape, num_classes = load_data(opt, dataset_name)
+        #lb = LabelBinarizer()
+        #y_train_onehot = lb.fit_transform(y_train)
         logger.info(('===========Done==============='))
 
         # get model
@@ -57,7 +68,8 @@ def train_scratch():
         model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)
         solver.fit(train_data=train_data, test_data=test_data, optimizer=optimizer, criterion=criterion,
-                   lr_scheduler=lr_scheduler, train_metric=train_metric)
+                   callbacks=callbacks, metric=metric)
+        solver.evaluate(test_data)
 
 
 # pre-train model for transfer learning

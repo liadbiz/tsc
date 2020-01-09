@@ -42,21 +42,21 @@ __C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'Bi
                             'SyntheticControl', 'ToeSegmentation1', 'ToeSegmentation2', 'Trace', 'TwoLeadECG',
                             'TwoPatterns', 'UWaveGestureLibraryAll', 'UWaveGestureLibraryX', 'UWaveGestureLibraryY',
                             'UWaveGestureLibraryZ', 'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
-__C.dataset.test_dataset_names = ['TwoPatterns']
+__C.dataset.test_dataset_names = ['Adiac']
 __C.model = edict()
-__C.model.name = "TSCNet"
-__C.model.num_layers = 5
+__C.model.name = "InceptionTime"
+__C.model.num_layers = 6
 
 __C.train = edict()
 __C.train.optimizer = 'SGD'
 __C.train.lr = 0.01
-__C.train.lr_factor = 0.2
+__C.train.lr_factor = 0.5
 __C.train.lr_patience = 50
 __C.train.lr_min_lr = 0.0001
 __C.train.lr_min_delta = 0.001
 __C.train.monitor = 'val_categorical_accuracy'
-__C.train.stop_patience = 200
+__C.train.stop_patience = 50
 __C.train.stop_min_delta = 0.0001
-__C.train.num_epochs = 2000
+__C.train.num_epochs = 1500
 __C.train.batch_size = 128
 __C.train.gpus = '0'

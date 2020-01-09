@@ -1,7 +1,10 @@
 import tensorflow as tf
-import tensorflow.keras as keras
+from tensorflow import keras
 import tensorflow.keras.regularizers as regularizers
-#######################Inception Model############################
+
+#######################TSC Model############################
+
+
 class ConvBNRelu(keras.layers.Layer):
     def __init__(self, channel, kernel_size=1, strides=1, padding='same'):
         super(ConvBNRelu, self).__init__(name='conv_block')
@@ -19,7 +22,6 @@ class ConvBNRelu(keras.layers.Layer):
 
 
 class InceptionBlk(keras.layers.Layer):
-
     def __init__(self, channel, strides=1):
         super(InceptionBlk, self).__init__(name='inception_block')
 
@@ -61,8 +63,8 @@ class InceptionBlk(keras.layers.Layer):
 
         return x
 
-class ReductionBlk(keras.layers.Layer):
 
+class ReductionBlk(keras.layers.Layer):
     def __init__(self, channel, strides=2):
         super(ReductionBlk, self).__init__(name='reduction_block')
 
@@ -76,7 +78,6 @@ class ReductionBlk(keras.layers.Layer):
         self.conv2_3 = ConvBNRelu(channel, kernel_size=3, strides=strides, padding='valid')
 
         self.pool = keras.layers.MaxPooling1D(3, strides=strides, padding='valid')
-
 
     def call(self, x):
         # branch 1
@@ -95,14 +96,14 @@ class ReductionBlk(keras.layers.Layer):
 
         return x
 
+
 class TSCNet(keras.Model):
-    def __init__(self, input_shape, num_classes, num_layers, bottleneck_channel=16, **kwargs):
+    def __init__(self, num_classes, num_layers, bottleneck_channel=16, **kwargs):
         super(TSCNet, self).__init__(**kwargs)
         self.bottleneck_channel = bottleneck_channel
         self.num_layers = num_layers
         #self.input_shape = input_shape
         self.num_classes = num_classes
-
 
         self.conv1 = ConvBNRelu(bottleneck_channel, kernel_size=3, strides=1, padding='same')
         self.conv2 = ConvBNRelu(bottleneck_channel, kernel_size=3, strides=2, padding='valid')
@@ -122,7 +123,6 @@ class TSCNet(keras.Model):
             # enlarger out_channels per block
             # self.out_channel *= 2
 
-
         self.avg_pool = keras.layers.GlobalAveragePooling1D()
         self.fc = keras.layers.Dense(num_classes, activation='softmax')
 
@@ -139,7 +139,81 @@ class TSCNet(keras.Model):
 
         return out
 
-##########################Inception Model Done##############################
+##########################TSC Model Done##############################
+
+
+#######################InceptionTIme Model############################
+
+class InceptionBlock(keras.layers.Layer):
+    def __init__(self, bottleneck_size, activation, stride, padding, nb_filters, kernel_size):
+        super(InceptionBlock, self).__init__(name='Incpetion_block')
+        self.bottleneck = keras.layers.Conv1D(filters=bottleneck_size, kernel_size=1,
+                                              padding=padding, activation=activation, use_bias=False)
+
+        kernel_size_s = [kernel_size // (2 ** i) for i in range(3)]
+
+        self.conv_list = []
+
+        for i in range(len(kernel_size_s)):
+            self.conv_list.append(keras.layers.Conv1D(filters=nb_filters, kernel_size=kernel_size_s[i],
+                                                 strides=stride, padding='same', activation=activation, use_bias=False))
+        self.max_pool_1 = keras.layers.MaxPool1D(pool_size=3, strides=stride, padding='same')
+
+        self.conv_6 = keras.layers.Conv1D(filters=nb_filters, kernel_size=1,
+                                     padding='same', activation=activation, use_bias=False)
+
+    def call(self, x):
+        out1 = self.max_pool_1(x)
+        out1 = self.conv_6(out1)
+
+        out_list = []
+
+        for conv in self.conv_list:
+            out_list.append(conv(x))
+
+        out_list.append(out1)
+
+        out = keras.layers.Concatenate(axis=2)(out_list)
+        out = keras.layers.BatchNormalization()(out)
+        out = keras.layers.Activation(activation='relu')(out)
+
+        return out
+
+
+class InceptionTime(keras.Model):
+    def __init__(self, nb_classes, depth, bottleneck_size=32, nb_filters=32, kernel_size=41, **kwargs):
+        super(InceptionTime, self).__init__(**kwargs)
+        self.nb_filters = nb_filters
+
+        self.depth = depth
+        self.kernel_size = kernel_size - 1
+
+        self.bottleneck_size = bottleneck_size
+
+        self.gap_layer = keras.layers.GlobalAveragePooling1D()
+        self.dense = keras.layers.Dense(nb_classes, activation='softmax')
+
+    def call(self, x):
+        res = x
+        for d in range(self.depth):
+            x = InceptionBlock(bottleneck_size=self.bottleneck_size, activation='linear', stride=1, padding='same',
+                               nb_filters=self.nb_filters, kernel_size=self.kernel_size)(x)
+
+            if d % 3 == 2:
+                x_ = keras.layers.Conv1D(filters=int(res.shape[-1]), kernel_size=1,
+                                         padding='same', use_bias=False)(x)
+                x = keras.layers.BatchNormalization()(x_)
+                x = keras.layers.Add()([x, res])
+                x = keras.layers.Activation('relu')(x)
+                res = x
+        x = self.gap_layer(x)
+        x = self.dense(x)
+        return x
+#######################InceptionTime Model Done############################
+
+
+
+
 
 #######################GRU Model############################
 #######################GRU Model Done############################

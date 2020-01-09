@@ -62,7 +62,7 @@ def train_scratch():
         logger.info(('===========Done==============='))
 
         # get model
-        model = getattr(models, opt.model.name)(input_shape, num_classes, opt.model.num_layers)
+        model = getattr(models, opt.model.name)(num_classes, opt.model.num_layers)
         # summary model
         model.build(input_shape=keras.Input(shape=input_shape).shape)
         model.summary()

@@ -1,12 +1,14 @@
+"""
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## Created by: Haihao Zhu
-## ShanghaiTech University
-## zhuhh2@shanghaitech.edu.cn
+## Shanghai Advanced Research Institute
+## zhuhaihao@sari.ac.cn
 ## Copyright (c) 2019
 ##
 ## This source code is licensed under the MIT-style license found in the
 ## LICENSE file in the root directory of this source tree
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"""
 
 import yaml
 from easydict import EasyDict as edict
@@ -44,11 +46,11 @@ __C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'Bi
                             'UWaveGestureLibraryZ', 'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 __C.dataset.test_dataset_names = ['Adiac']
 __C.model = edict()
-__C.model.name = "Inception"
-__C.model.num_layers = 2
+__C.model.name = "ResNet"
+__C.model.num_layers = 5
 
 __C.train = edict()
-__C.train.optimizer = 'SGD'
+__C.train.optimizer = 'Adam'
 __C.train.lr = 0.01
 __C.train.lr_factor = 0.5
 __C.train.lr_patience = 50

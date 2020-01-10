@@ -12,7 +12,8 @@ import tensorflow as tf
 import tensorflow.keras as keras
 from utils.config import opt
 
-import models
+from models.TSCNet import TSCNet
+from models.ResNet import build_resnet
 from utils.data_loader import load_data
 from utils.model_solver import Solver
 import argparse
@@ -52,7 +53,8 @@ def train_scratch():
     early_stop = keras.callbacks.EarlyStopping(monitor=opt.train.monitor, min_delta=opt.train.stop_min_delta,
                                                patience=opt.train.stop_patience, verbose=1,
                                                restore_best_weights=True)
-    callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
+    #callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
+    callbacks = [lr_scheduler, early_stop]
     for dataset_name in opt.dataset.test_dataset_names:
         # get data
         logger.info('============loading data============')
@@ -62,9 +64,13 @@ def train_scratch():
         logger.info(('===========Done==============='))
 
         # get model
-        model = getattr(models, opt.model.name)(num_classes, opt.model.num_layers)
+        if opt.model.name == 'TSCNet':
+            model = TSCNet(num_classes, opt.model.num_layers)
+        if opt.model.name == 'ResNet':
+            x, y = build_resnet(input_shape, 64, num_classes)
+            model = keras.models.Model(inputs=x, outputs=y)
         # summary model
-        model.build(input_shape=keras.Input(shape=input_shape).shape)
+
         model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)
         solver.fit(train_data=train_data, test_data=test_data, optimizer=optimizer, criterion=criterion,

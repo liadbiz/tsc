@@ -15,8 +15,8 @@ class ConvBNRelu(keras.layers.Layer):
             keras.layers.ReLU()
         ])
 
-    def call(self, x):
-        x = self.model(x)
+    def call(self, x, training=None):
+        x = self.model(x, training)
 
         return x
 
@@ -41,22 +41,22 @@ class InceptionBlk(keras.layers.Layer):
         self.pool = keras.layers.MaxPooling1D(3, strides=1, padding='same')
         self.pool_conv = ConvBNRelu(channel, strides=1)
 
-    def call(self, x):
+    def call(self, x, training=None):
         # branch 1
-        x1 = self.conv1_1(x)
+        x1 = self.conv1_1(x, training=training)
 
         # branch 2
-        x2_1 = self.conv2_1(x)
-        x2 = self.conv2_2(x2_1)
+        x2_1 = self.conv2_1(x, training=training)
+        x2 = self.conv2_2(x2_1, training=training)
 
         # branch 3
-        x3_1 = self.conv3_1(x)
-        x3_2 = self.conv3_2(x3_1)
-        x3 = self.conv3_3(x3_2)
+        x3_1 = self.conv3_1(x, training=training)
+        x3_2 = self.conv3_2(x3_1, training=training)
+        x3 = self.conv3_3(x3_2, training=training)
 
         # branch 4
         x4 = self.pool(x)
-        x4 = self.pool_conv(x4)
+        x4 = self.pool_conv(x4, training=training)
 
         # concat along axis=channel
         x = tf.concat([x1, x2, x3, x4], axis=-1)
@@ -79,14 +79,14 @@ class ReductionBlk(keras.layers.Layer):
 
         self.pool = keras.layers.MaxPooling1D(3, strides=strides, padding='valid')
 
-    def call(self, x):
+    def call(self, x, training=None):
         # branch 1
-        x1 = self.conv1_1(x)
+        x1 = self.conv1_1(x, training=training)
 
         # branch 2
-        x2_1 = self.conv2_1(x)
-        x2_2 = self.conv2_2(x2_1)
-        x2 = self.conv2_3(x2_2)
+        x2_1 = self.conv2_1(x, training=training)
+        x2_2 = self.conv2_2(x2_1, training=training)
+        x2 = self.conv2_3(x2_2, training=training)
 
         x3 = self.pool(x)
 
@@ -126,13 +126,13 @@ class TSCNet(keras.Model):
         self.avg_pool = keras.layers.GlobalAveragePooling1D()
         self.fc = keras.layers.Dense(num_classes, activation='softmax')
 
-    def call(self, x):
-        out = self.conv1(x)
-        out = self.conv2(out)
-        out = self.conv3(out)
-        out = self.conv4(out)
+    def call(self, x, training=None):
+        out = self.conv1(x, training=training)
+        out = self.conv2(out, training=training)
+        out = self.conv3(out, training=training)
+        out = self.conv4(out, training=training)
 
-        out = self.blocks(out)
+        out = self.blocks(out, training=training)
 
         out = self.avg_pool(out)
         out = self.fc(out)

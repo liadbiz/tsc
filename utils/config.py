@@ -44,8 +44,8 @@ __C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'Bi
                             'UWaveGestureLibraryZ', 'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 __C.dataset.test_dataset_names = ['Adiac']
 __C.model = edict()
-__C.model.name = "InceptionTime"
-__C.model.num_layers = 6
+__C.model.name = "TSCNet"
+__C.model.num_layers = 5
 
 __C.train = edict()
 __C.train.optimizer = 'SGD'

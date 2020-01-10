@@ -112,7 +112,7 @@ class TSCNet(keras.Model):
 
         self.blocks = keras.models.Sequential()
 
-        assert self.num_layers % 3 == 2
+        #assert self.num_layers % 3 == 2
         for block_id in range(1, self.num_layers + 1):
 
             if block_id % 3 == 0:

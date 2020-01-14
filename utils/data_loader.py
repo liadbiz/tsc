@@ -41,8 +41,8 @@ def load_data(opt, dataset_name):
     y_train = (y_train - y_train.min()) / (y_train.max() - y_train.min()) * (num_classes - 1)
     y_test = (y_test - y_test.min()) / (y_test.max() - y_test.min()) * (num_classes - 1)
 
-    Y_train = keras.utils.to_categorical(y_train, num_classes)
-    Y_test = keras.utils.to_categorical(y_test, num_classes)
+    y_train = keras.utils.to_categorical(y_train, num_classes)
+    y_test = keras.utils.to_categorical(y_test, num_classes)
 
     x_train_mean = x_train.mean()
     x_train_std = x_train.std()

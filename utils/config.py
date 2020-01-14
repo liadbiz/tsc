@@ -46,7 +46,7 @@ __C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'Bi
                             'UWaveGestureLibraryZ', 'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 __C.dataset.test_dataset_names = ['Adiac']
 __C.model = edict()
-__C.model.name = "ResNet"
+__C.model.name = "FCN"
 __C.model.num_layers = 5
 
 __C.train = edict()
@@ -56,7 +56,7 @@ __C.train.lr_factor = 0.5
 __C.train.lr_patience = 50
 __C.train.lr_min_lr = 0.0001
 __C.train.lr_min_delta = 0.001
-__C.train.monitor = 'val_categorical_accuracy'
+__C.train.monitor = 'val_loss'
 __C.train.stop_patience = 50
 __C.train.stop_min_delta = 0.0001
 __C.train.num_epochs = 1500

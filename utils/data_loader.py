@@ -34,11 +34,24 @@ def load_data(opt, dataset_name):
     x_train, y_train = readucr(data_path + dataset_name + '_TRAIN.txt')
     x_test, y_test = readucr(data_path + dataset_name + '_TEST.txt')
 
-    x_train, x_test = np.expand_dims(x_train, axis=3), np.expand_dims(x_test, axis=3)
+
     input_shape = x_train.shape[1:]
     num_classes = int(np.max(np.concatenate((y_train, y_test))))
-    y_train = tf.one_hot(y_train, depth=num_classes)
-    y_test = tf.one_hot(y_test, depth=num_classes)
+
+    y_train = (y_train - y_train.min()) / (y_train.max() - y_train.min()) * (num_classes - 1)
+    y_test = (y_test - y_test.min()) / (y_test.max() - y_test.min()) * (num_classes - 1)
+
+    Y_train = keras.utils.to_categorical(y_train, num_classes)
+    Y_test = keras.utils.to_categorical(y_test, num_classes)
+
+    x_train_mean = x_train.mean()
+    x_train_std = x_train.std()
+    x_train = (x_train - x_train_mean) / (x_train_std)
+    x_test = (x_test - x_train_mean) / (x_train_std)
+
+    x_train, x_test = np.expand_dims(x_train, axis=3), np.expand_dims(x_test, axis=3)
+    #y_train = tf.one_hot(y_train, depth=num_classes)
+    #y_test = tf.one_hot(y_test, depth=num_classes)
     print(x_train.shape, y_train.shape)
     print(x_test.shape, y_test.shape)
     data_train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(buffer_size=1000).batch(opt.train.batch_size)

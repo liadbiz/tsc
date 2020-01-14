@@ -35,7 +35,7 @@ def load_data(opt, dataset_name):
     x_test, y_test = readucr(data_path + dataset_name + '_TEST.txt')
 
 
-    input_shape = x_train.shape[1:]
+
     num_classes = int(np.max(np.concatenate((y_train, y_test))))
 
     y_train = (y_train - y_train.min()) / (y_train.max() - y_train.min()) * (num_classes - 1)
@@ -50,6 +50,7 @@ def load_data(opt, dataset_name):
     x_test = (x_test - x_train_mean) / (x_train_std)
 
     x_train, x_test = np.expand_dims(x_train, axis=3), np.expand_dims(x_test, axis=3)
+    input_shape = x_train.shape[1:]
     #y_train = tf.one_hot(y_train, depth=num_classes)
     #y_test = tf.one_hot(y_test, depth=num_classes)
     print(x_train.shape, y_train.shape)

@@ -39,7 +39,7 @@ logger.addHandler(sh)
 
 # train model from scratch
 def train_scratch():
-    optimizer = getattr(keras.optimizers, opt.train.optimizer)(learning_rate=opt.train.lr)
+    optimizer = getattr(keras.optimizers, opt.train.optimizer)()
     criterion = keras.losses.CategoricalCrossentropy()
     metric = keras.metrics.CategoricalAccuracy()
     # val_metric = keras.metrics.CategoricalAccuracy()
@@ -55,7 +55,7 @@ def train_scratch():
                                                patience=opt.train.stop_patience, verbose=1,
                                                restore_best_weights=True)
     #callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
-    callbacks = [lr_scheduler, early_stop]
+    callbacks = [lr_scheduler]
     for dataset_name in opt.dataset.test_dataset_names:
         # get data
         logger.info('============loading data============')

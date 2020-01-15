@@ -46,7 +46,7 @@ __C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'Bi
                             'UWaveGestureLibraryZ', 'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 __C.dataset.test_dataset_names = ['Adiac']
 __C.model = edict()
-__C.model.name = "FCN"
+__C.model.name = "ResNet"
 __C.model.num_layers = 5
 
 __C.train = edict()
@@ -60,5 +60,5 @@ __C.train.monitor = 'val_loss'
 __C.train.stop_patience = 50
 __C.train.stop_min_delta = 0.0001
 __C.train.num_epochs = 1500
-__C.train.batch_size = 128
+__C.train.batch_size = 16
 __C.train.gpus = '0'

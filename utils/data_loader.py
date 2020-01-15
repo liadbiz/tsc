@@ -34,9 +34,8 @@ def load_data(opt, dataset_name):
     x_train, y_train = readucr(data_path + dataset_name + '_TRAIN.txt')
     x_test, y_test = readucr(data_path + dataset_name + '_TEST.txt')
 
-
-
-    num_classes = int(np.max(np.concatenate((y_train, y_test))))
+    assert len(np.unique(y_test)) == len(np.unique(y_train))
+    num_classes = len(np.unique(y_test))
 
     y_train = (y_train - y_train.min()) / (y_train.max() - y_train.min()) * (num_classes - 1)
     y_test = (y_test - y_test.min()) / (y_test.max() - y_test.min()) * (num_classes - 1)
@@ -46,21 +45,18 @@ def load_data(opt, dataset_name):
 
     x_train_mean = x_train.mean()
     x_train_std = x_train.std()
-    x_train = (x_train - x_train_mean) / (x_train_std)
-    x_test = (x_test - x_train_mean) / (x_train_std)
+    x_train = (x_train - x_train_mean) / x_train_std
+    x_test = (x_test - x_train_mean) / x_train_std
 
-    x_train, x_test = np.expand_dims(x_train, axis=3), np.expand_dims(x_test, axis=3)
+    x_train, x_test = np.expand_dims(x_train, axis=2), np.expand_dims(x_test, axis=2)
     input_shape = x_train.shape[1:]
-    #y_train = tf.one_hot(y_train, depth=num_classes)
-    #y_test = tf.one_hot(y_test, depth=num_classes)
     print(x_train.shape, y_train.shape)
     print(x_test.shape, y_test.shape)
     data_train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(buffer_size=1000).batch(opt.train.batch_size)
     data_test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).shuffle(buffer_size=1000).batch(opt.train.batch_size)
 
-    #print(y_train)
-    #return x_train, y_train, x_test, y_test, input_shape, num_classes
     return data_train, data_test, input_shape, num_classes
+    #return (x_train, y_train), (x_test, y_test), input_shape, num_classes
 
 
 def check_if_file_exits(file_name):
@@ -71,7 +67,7 @@ def readucr(filename):
     data = np.loadtxt(filename)
     Y = data[:, 0]
     X = data[:, 1:]
-    return X.astype('float32'), Y.astype('int32')
+    return X, Y
 
 
 def readsits(filename):

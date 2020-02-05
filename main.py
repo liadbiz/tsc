@@ -38,7 +38,7 @@ sh.setFormatter(formatter)
 logger.addHandler(sh)
 
 # train model from scratch
-def train_scratch():
+def train_scratch(model_name):
     optimizer = getattr(keras.optimizers, opt.train.optimizer)()
     criterion = keras.losses.CategoricalCrossentropy()
     metric = keras.metrics.CategoricalAccuracy()
@@ -64,6 +64,8 @@ def train_scratch():
         #y_train_onehot = lb.fit_transform(y_train)
         logger.info(('===========Done==============='))
 
+        if model_name != opt.model.name:
+            opt.model.name = model_name
         # get model
         if opt.model.name == 'TSCNet':
             model = TSCNet(num_classes, opt.model.num_layers)
@@ -100,11 +102,12 @@ def main():
     parser = argparse.ArgumentParser(description='model training')
     parser.add_argument('--config_file', type=str, default=None, help='optional config file for training')
     parser.add_argument('--exp_type', type=str, default='scratch', help='experiment type')
+    parser.add_argument('--model', type=str, default='TSCNet', help='model name')
 
     args = parser.parse_args()
 
     if args.exp_type == 'scratch':
-        train_scratch()
+        train_scratch(model_name=args.model)
     elif args.exp_type == 'pre':
         train_pre()
     elif args.exp_type == 'transfer':

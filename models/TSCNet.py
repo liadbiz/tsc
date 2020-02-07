@@ -134,3 +134,6 @@ class TSCNet(keras.Model):
         out = self.fc(out)
 
         return out
+
+def build_tscnet(input_shape, num_classes):
+    x = keras.layers.Input(shape=(input_shape))

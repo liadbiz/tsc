@@ -46,7 +46,7 @@ class Solver(object):
         duration = end_time - start_time
         print('duration of training dataset {0} is {1}'.format(self.dataset_name, duration))
 
-        #print('\nhistory dict:', history.history)
+        print('min validate accuracy: {0}'.format(history.history['val_categorical_history']))
 
 
 

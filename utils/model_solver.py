@@ -47,7 +47,7 @@ class Solver(object):
         duration = end_time - start_time
         print('duration of training dataset {0} is {1}'.format(self.dataset_name, duration))
 
-        print('min validate accuracy: {0}'.format(np.min(history.history['val_categorical_history'])))
+        print('min validate accuracy: {0}'.format(np.max(history.history['val_categorical_accuracy'])))
 
 
 

@@ -115,7 +115,7 @@ def shortcut(input, residual):
                                        kernel_initializer='he_normal',
                                        kernel_regularizer=l2(0.0001))(input)
 
-    return keras.layers.add()([shortcut, residual])
+    return keras.layers.Add()([shortcut, residual])
 
 
 def bn_relu(x):

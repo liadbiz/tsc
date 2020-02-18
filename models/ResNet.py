@@ -123,25 +123,28 @@ def bn_relu(x):
     return keras.layers.Activation('relu')(norm)
 
 
-def bn_relu_conv(nb_filter, kernel_size, strides, padding, x):
+def bn_relu_conv(nb_filter, kernel_size, strides, padding='same'):
     """
     bn-relu-filter
     see http://arxiv.org/pdf/1603.05027v2.pdf for more details
     """
-    acti = bn_relu(x)
-    return keras.layers.Conv1D(nb_filter, kernel_size, strides, padding, kernel_initializer='he_normal',
+    def f(x):
+        acti = bn_relu(x)
+        return keras.layers.Conv1D(nb_filter, kernel_size, strides, padding, kernel_initializer='he_normal',
                                kernel_regularizer=l2(0.0001))(acti)
+    return f
 
 
-def conv_bn_relu(nb_filter, kernel_size, strides, padding, x):
+def conv_bn_relu(nb_filter, kernel_size, strides, padding='same'):
     """
     filer-bn-relu
     see http://arxiv.org/pdf/1603.05027v2.pdf for more details
     """
-    fea = keras.layers.Conv1D(nb_filter, kernel_size, strides, padding, kernel_initializer='he_normal',
+    def f(x):
+        fea = keras.layers.Conv1D(nb_filter, kernel_size, strides, padding, kernel_initializer='he_normal',
                               kernel_regularizer=l2(0.0001))(x)
-    return bn_relu(fea)
-
+        return bn_relu(fea)
+    return f
 
 def residual_block(filters, repetitions, is_first_layer):
     def f(input):
@@ -172,7 +175,7 @@ class ResnetBuilder(object):
         :return: a keras model
         """
         input = keras.layers.Input(shape=(input_shape))
-        conv1 = conv_bn_relu(nb_filter=64, kernel_size=7, strides=2, padding='same', x=input)
+        conv1 = conv_bn_relu(nb_filter=64, kernel_size=7, strides=2)(input)
         pool1 = keras.layers.MaxPooling1D(pool_size=3, strides=2, padding="same")(conv1)
         block = pool1
         filters = 16

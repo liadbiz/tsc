@@ -76,7 +76,8 @@ def train_scratch(model_name):
             x, y = build_fcn(input_shape, num_classes)
             model = keras.models.Model(inputs=x, outputs=y)
         elif opt.model.name == 'RensNet18':
-            x, y = build_resnet18(input_shape, num_classes, )
+            x, y = build_resnet18(input_shape, num_classes)
+            model = keras.models.Model(inputs=x, outputs=y)
         # summary model
         model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)

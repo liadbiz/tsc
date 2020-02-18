@@ -79,7 +79,7 @@ def train_scratch(model_name):
             model = keras.models.Model(inputs=x, outputs=y)
         elif opt.model.name == 'ResNet34':
             x, y = build_resnet34(input_shape, num_classes)
-            model = keras.model.Model(input=x, outputs=y)
+            model = keras.models.Model(input=x, outputs=y)
         # summary model
         model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)

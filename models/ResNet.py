@@ -1,5 +1,5 @@
-from tensorflow import keras
-
+import tensorflow.keras as keras
+from tensorflow.keras.regularizers import l2
 
 def build_resnet(input_shape, n_feature_maps, nb_classes):
     x = keras.layers.Input(shape=(input_shape))
@@ -81,7 +81,7 @@ def build_resnet(input_shape, n_feature_maps, nb_classes):
     return x, out
 
 
-def basic_block(filters, init_strides=(1, 1), is_first_block_of_first_layer=False):
+def basic_block(filters, init_strides=1, is_first_block_of_first_layer=False):
     """Basic 3 X 3 convolution blocks for use on resnets with layers <= 34.
     Follows improved proposed scheme in http://arxiv.org/pdf/1603.05027v2.pdf
     """
@@ -94,22 +94,26 @@ def basic_block(filters, init_strides=(1, 1), is_first_block_of_first_layer=Fals
                            padding="same",
                            )(input)
         else:
-            conv1 = bn_relu_conv(filters=filters, kernel_size=3,
+            conv1 = bn_relu_conv(nb_filter=filters, kernel_size=3,
                                   strides=init_strides)(input)
 
-        residual = bn_relu_conv(filters=filters, kernel_size=3, strides=init_strides)(conv1)
+        residual = bn_relu_conv(nb_filter=filters, kernel_size=3, strides=init_strides)(conv1)
         return shortcut(input, residual)
 
     return f
 
 
 def shortcut(input, residual):
-    if input.shape[-1] != residual.shape[-1]:
-        shortcut = keras.layers.Conv1D(filters=64,
-                          kernel_size=1,
-                          strides=2,
-                          padding="same",
-                          )(input)
+    input_with = input.shape[1]
+    residual_with = residual.shape[1]
+    stride = int(round(input_with / residual_with))
+    if stride > 1 or input.shape[-1] != residual.shape[-1]:
+        shortcut = keras.layers.Conv1D(filters=residual.shape[-1],
+                                       kernel_size=1,
+                                       strides=stride,
+                                       padding="valid",
+                                       kernel_initializer='he_normal',
+                                       kernel_regularizer=l2(0.0001))(input)
 
     return keras.layers.add()([shortcut, residual])
 
@@ -118,25 +122,33 @@ def bn_relu(x):
     norm = keras.layers.BatchNormalization()(x)
     return keras.layers.Activation('relu')(norm)
 
+
 def bn_relu_conv(nb_filter, kernel_size, strides, padding, x):
     """
     bn-relu-filter
     see http://arxiv.org/pdf/1603.05027v2.pdf for more details
-    :param nb_filter:
-    :param kernel_size:
-    :param strides:
-    :return:
     """
     acti = bn_relu(x)
-    return keras.layers.Conv1D(nb_filter, kernel_size, strides, padding)(acti)
+    return keras.layers.Conv1D(nb_filter, kernel_size, strides, padding, kernel_initializer='he_normal',
+                               kernel_regularizer=l2(0.0001))(acti)
+
+
+def conv_bn_relu(nb_filter, kernel_size, strides, padding, x):
+    """
+    filer-bn-relu
+    see http://arxiv.org/pdf/1603.05027v2.pdf for more details
+    """
+    fea = keras.layers.Conv1D(nb_filter, kernel_size, strides, padding, kernel_initializer='he_normal',
+                              kernel_regularizer=l2(0.0001))(x)
+    return bn_relu(fea)
 
 
 def residual_block(filters, repetitions, is_first_layer):
     def f(input):
         for i in range(repetitions):
-            init_strides = (1, 1)
+            init_strides = 1
             if i == 0 and not is_first_layer:
-                init_strides = (2, 2)
+                init_strides = 2
             input = basic_block(filters=filters, init_strides=init_strides,
                                    is_first_block_of_first_layer=(is_first_layer and i == 0))(input)
         return input
@@ -144,17 +156,34 @@ def residual_block(filters, repetitions, is_first_layer):
     return f
 
 def build_resnet18(input_shape, num_classes):
-    input = keras.layers.Input(shape=(input_shape))
-    conv1 = bn_relu_conv(filters=64, kernel_size=7, strides=2, padding='same', x=input)
-    pool1 = keras.layers.MaxPooling1D(pool_size=3, strides=2, padding="same")(conv1)
-    block = pool1
-    filters = 64
     repetitions = [2, 2, 2, 2]
-    for i, r in enumerate(repetitions):
-        block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0))(block)
-        filters *= 2
-    block = bn_relu(block)
-    full = keras.layers.GlobalAveragePooling1D()(block)
-    out = keras.layers.Dense(num_classes, activation='softmax')(full)
-    print('        -- model was built.')
-    return input, out
+    return ResnetBuilder.build(input_shape, num_classes, repetitions)
+
+
+
+class ResnetBuilder(object):
+    @staticmethod
+    def build(input_shape, num_classes, repetitions):
+        """build custom resnet architecture like network
+
+        :param input_shape: input shape of input data
+        :param num_classes: number of class in final softmax layer
+        :param repetitions: number of repetitions of each block
+        :return: a keras model
+        """
+        input = keras.layers.Input(shape=(input_shape))
+        conv1 = conv_bn_relu(nb_filter=64, kernel_size=7, strides=2, padding='same', x=input)
+        pool1 = keras.layers.MaxPooling1D(pool_size=3, strides=2, padding="same")(conv1)
+        block = pool1
+        filters = 16
+        for i, r in enumerate(repetitions):
+            block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0))(block)
+            filters *= 2
+        block = bn_relu(block)
+        full = keras.layers.GlobalAveragePooling1D()(block)
+        out = keras.layers.Dense(num_classes, activation='softmax')(full)
+        print('        -- model was built.')
+        return input, out
+
+
+

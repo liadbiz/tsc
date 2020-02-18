@@ -63,7 +63,6 @@ def train_scratch(model_name):
         #lb = LabelBinarizer()
         #y_train_onehot = lb.fit_transform(y_train)
         logger.info(('===========Done==============='))
-
         if model_name != opt.model.name:
             opt.model.name = model_name
         # get model
@@ -75,7 +74,7 @@ def train_scratch(model_name):
         elif opt.model.name == 'FCN':
             x, y = build_fcn(input_shape, num_classes)
             model = keras.models.Model(inputs=x, outputs=y)
-        elif opt.model.name == 'RensNet18':
+        elif opt.model.name == 'ResNet18':
             x, y = build_resnet18(input_shape, num_classes)
             model = keras.models.Model(inputs=x, outputs=y)
         # summary model

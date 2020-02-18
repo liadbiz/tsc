@@ -107,15 +107,16 @@ def shortcut(input, residual):
     input_with = input.shape[1]
     residual_with = residual.shape[1]
     stride = int(round(input_with / residual_with))
+    short = input
     if stride > 1 or input.shape[-1] != residual.shape[-1]:
-        shortcut = keras.layers.Conv1D(filters=residual.shape[-1],
+        short = keras.layers.Conv1D(filters=residual.shape[-1],
                                        kernel_size=1,
                                        strides=stride,
                                        padding="valid",
                                        kernel_initializer='he_normal',
                                        kernel_regularizer=l2(0.0001))(input)
 
-    return keras.layers.Add()([shortcut, residual])
+    return keras.layers.Add()([short, residual])
 
 
 def bn_relu(x):

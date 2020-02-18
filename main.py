@@ -13,7 +13,7 @@ from tensorflow import keras
 from utils.config import opt
 
 from models.TSCNet import TSCNet
-from models.ResNet import build_resnet, build_resnet18
+from models.ResNet import build_resnet, build_resnet18, build_resnet34
 from models.FCN import build_fcn
 from utils.data_loader import load_data
 from utils.model_solver import Solver
@@ -77,6 +77,9 @@ def train_scratch(model_name):
         elif opt.model.name == 'ResNet18':
             x, y = build_resnet18(input_shape, num_classes)
             model = keras.models.Model(inputs=x, outputs=y)
+        elif opt.model.name == 'ResNet34':
+            x, y = build_resnet34(input_shape, num_classes)
+            model = keras.model.Model(input=x, outputs=y)
         # summary model
         model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)

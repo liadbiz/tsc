@@ -163,7 +163,9 @@ def build_resnet18(input_shape, num_classes):
     repetitions = [2, 2, 2, 2]
     return ResnetBuilder.build(input_shape, num_classes, repetitions)
 
-
+def build_resnet34(input_shape, num_classes):
+    repetitions = [3, 4, 6, 3]
+    return ResnetBuilder.build(input_shape, num_classes, repetitions)
 
 class ResnetBuilder(object):
     @staticmethod
@@ -179,7 +181,7 @@ class ResnetBuilder(object):
         conv1 = conv_bn_relu(nb_filter=64, kernel_size=7, strides=2)(input)
         pool1 = keras.layers.MaxPooling1D(pool_size=3, strides=2, padding="same")(conv1)
         block = pool1
-        filters = 16
+        filters = 32
         for i, r in enumerate(repetitions):
             block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0))(block)
             filters *= 2

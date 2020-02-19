@@ -219,7 +219,7 @@ class ResnetBuilder(object):
         return input, out
 
 def build_resnet10(input_shape, num_classes):
-    repetitions = [1, 1, 1, 1]
+    repetitions = [1, 1, 1]
     return ResnetBuilder.build(input_shape, num_classes, 'basic', repetitions)
 
 def build_resnet18(input_shape, num_classes):

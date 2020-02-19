@@ -94,9 +94,9 @@ def basic_block(filters, init_strides=1, is_first_block_of_first_layer=False):
                            padding="same",
                            )(input)
         else:
-            conv1 = bn_relu_conv(nb_filter=filters, kernel_size=7,
+            conv1 = bn_relu_conv(nb_filter=filters, kernel_size=3,
                                   strides=init_strides)(input)
-        conv2 = bn_relu_conv(nb_filter=filters, kernel_size=5, strides=init_strides)(conv1)
+        conv2 = bn_relu_conv(nb_filter=filters, kernel_size=3, strides=init_strides)(conv1)
         residual = bn_relu_conv(nb_filter=filters, kernel_size=3, strides=init_strides)(conv2)
         return shortcut(input, residual)
 

@@ -89,15 +89,15 @@ def basic_block(filters, init_strides=1, is_first_block_of_first_layer=False):
 
         if is_first_block_of_first_layer:
             # don't repeat bn->relu since we just did bn->relu->maxpool
-            conv1 = keras.layers.Conv1D(filters=filters, kernel_size=3,
+            conv1 = keras.layers.Conv1D(filters=filters, kernel_size=7,
                            strides=init_strides,
                            padding="same",
                            )(input)
         else:
-            conv1 = bn_relu_conv(nb_filter=filters, kernel_size=3,
+            conv1 = bn_relu_conv(nb_filter=filters, kernel_size=7,
                                   strides=init_strides)(input)
-
-        residual = bn_relu_conv(nb_filter=filters, kernel_size=3, strides=init_strides)(conv1)
+        conv2 = bn_relu_conv(nb_filter=filters, kernel_size=5, strides=init_strides)(conv1)
+        residual = bn_relu_conv(nb_filter=filters, kernel_size=3, strides=init_strides)(conv2)
         return shortcut(input, residual)
 
     return f

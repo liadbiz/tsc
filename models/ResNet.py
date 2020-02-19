@@ -94,12 +94,14 @@ def basic_block(filters, init_strides=1, is_first_block_of_first_layer=False):
                            padding="same",
                            )(input)
         else:
+            print("input shape:{0}".format(input))
             conv1 = bn_relu_conv(nb_filter=filters, kernel_size=3,
                                   strides=init_strides)(input)
         print("conv1 shape: {0}".format(conv1.shape))
-        conv2 = bn_relu_conv(nb_filter=filters, kernel_size=3, strides=init_strides)(conv1)
+        conv2 = bn_relu_conv(nb_filter=filters, kernel_size=3)(conv1)
         print("conv2 shape: {0}".format(conv2.shape))
-        residual = bn_relu_conv(nb_filter=filters, kernel_size=3, strides=init_strides)(conv2)
+        residual = bn_relu_conv(nb_filter=filters, kernel_size=3)(conv2)
+        print('residual shape: {0}'.format(residual))
         return shortcut(input, residual)
 
     return f
@@ -134,12 +136,12 @@ def shortcut(input, residual):
     short = input
     if stride > 1 or input.shape[-1] != residual.shape[-1]:
         short = keras.layers.Conv1D(filters=residual.shape[-1],
-                                       kernel_size=1,
-                                       strides=stride,
-                                       padding="valid",
-                                       kernel_initializer='he_normal',
-                                       kernel_regularizer=l2(0.0001))(input)
-    print(short.shape, residual.shape)
+                                    kernel_size=1,
+                                    strides=stride,
+                                    padding="valid",
+                                    kernel_initializer='he_normal',
+                                    kernel_regularizer=l2(0.0001))(input)
+    print("short shape : {0}, residual shape: {1}".format(short.shape, residual.shape))
     return keras.layers.Add()([short, residual])
 
 

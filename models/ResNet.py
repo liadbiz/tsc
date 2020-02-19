@@ -102,6 +102,28 @@ def basic_block(filters, init_strides=1, is_first_block_of_first_layer=False):
 
     return f
 
+def bottleneck_block(filters, init_strides=1, is_first_block_of_first_layer=False):
+    """bottleneck blocks for use on resnets with layers > 34.
+    Follows improved proposed scheme in http://arxiv.org/pdf/1603.05027v2.pdf
+    """
+    def f(input):
+
+        if is_first_block_of_first_layer:
+            # don't repeat bn->relu since we just did bn->relu->maxpool
+            conv1 = keras.layers.Conv1D(filters=filters, kernel_size=1,
+                           strides=init_strides,
+                           padding="same",
+                           )(input)
+        else:
+            conv1 = bn_relu_conv(nb_filter=filters, kernel_size=1,
+                                  strides=init_strides)(input)
+
+        conv3 = bn_relu_conv(nb_filter=filters, kernel_size=3)(conv1)
+        residual = bn_relu_conv(nb_filter=filters*4, kernel_size=1, strides=init_strides)(conv3)
+        return shortcut(input, residual)
+
+    return f
+
 
 def shortcut(input, residual):
     input_with = input.shape[1]
@@ -124,7 +146,7 @@ def bn_relu(x):
     return keras.layers.Activation('relu')(norm)
 
 
-def bn_relu_conv(nb_filter, kernel_size, strides, padding='same'):
+def bn_relu_conv(nb_filter, kernel_size, strides=1, padding='same'):
     """
     bn-relu-filter
     see http://arxiv.org/pdf/1603.05027v2.pdf for more details
@@ -147,13 +169,17 @@ def conv_bn_relu(nb_filter, kernel_size, strides, padding='same'):
         return bn_relu(fea)
     return f
 
-def residual_block(filters, repetitions, is_first_layer):
+def residual_block(filters, repetitions, is_first_layer, block_func):
     def f(input):
         for i in range(repetitions):
             init_strides = 1
             if i == 0 and not is_first_layer:
                 init_strides = 2
-            input = basic_block(filters=filters, init_strides=init_strides,
+            if block_func == 'basic':
+                input = basic_block(filters=filters, init_strides=init_strides,
+                                   is_first_block_of_first_layer=(is_first_layer and i == 0))(input)
+            if block_func == 'bottleneck':
+                input = bottleneck_block(filters=filters, init_strides=init_strides,
                                    is_first_block_of_first_layer=(is_first_layer and i == 0))(input)
         return input
 
@@ -161,15 +187,19 @@ def residual_block(filters, repetitions, is_first_layer):
 
 def build_resnet18(input_shape, num_classes):
     repetitions = [2, 2, 2, 2]
-    return ResnetBuilder.build(input_shape, num_classes, repetitions)
+    return ResnetBuilder.build(input_shape, num_classes, 'basic'，repetitions)
 
 def build_resnet34(input_shape, num_classes):
     repetitions = [3, 4, 6, 3]
-    return ResnetBuilder.build(input_shape, num_classes, repetitions)
+    return ResnetBuilder.build(input_shape, num_classes, 'basic', repetitions)
+
+def build_resnet50(input_shape, num_classes):
+    repetitions = [3, 4, 6, 3]
+        return ResnetBuilder.build(input_shape, num_classes, 'bottleneck', repetitions)
 
 class ResnetBuilder(object):
     @staticmethod
-    def build(input_shape, num_classes, repetitions):
+    def build(input_shape, num_classes, block_func, repetitions):
         """build custom resnet architecture like network
 
         :param input_shape: input shape of input data
@@ -183,7 +213,7 @@ class ResnetBuilder(object):
         block = pool1
         filters = 16
         for i, r in enumerate(repetitions):
-            block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0))(block)
+            block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0), block_func)(block)
             filters *= 2
         block = bn_relu(block)
         full = keras.layers.GlobalAveragePooling1D()(block)

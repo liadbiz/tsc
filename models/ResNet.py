@@ -137,7 +137,7 @@ def shortcut(input, residual):
                                        padding="valid",
                                        kernel_initializer='he_normal',
                                        kernel_regularizer=l2(0.0001))(input)
-
+    print(short.shape, residual.shape)
     return keras.layers.Add()([short, residual])
 
 
@@ -197,11 +197,15 @@ class ResnetBuilder(object):
         :return: a keras model
         """
         input = keras.layers.Input(shape=(input_shape))
+        print(input.shape)
         conv1 = conv_bn_relu(nb_filter=64, kernel_size=7, strides=2)(input)
+        print(conv1.shape)
         pool1 = keras.layers.MaxPooling1D(pool_size=3, strides=2, padding="same")(conv1)
+        print(pool1.shape)
         block = pool1
         filters = 64
         for i, r in enumerate(repetitions):
+            print(i, r)
             block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0), block_func=block_func)(block)
             filters *= 2
         block = bn_relu(block)

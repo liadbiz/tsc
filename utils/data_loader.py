@@ -52,8 +52,9 @@ def load_data(opt, dataset_name):
     input_shape = x_train.shape[1:]
     print(x_train.shape, y_train.shape)
     print(x_test.shape, y_test.shape)
-    data_train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(buffer_size=1000).batch(opt.train.batch_size)
-    data_test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).shuffle(buffer_size=1000).batch(opt.train.batch_size)
+    batch_size = int(min(x_train.shape[0] / 10, opt.train.batch_size))
+    data_train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(buffer_size=1000).batch(batch_size)
+    data_test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).shuffle(buffer_size=1000).batch(batch_size)
 
     return data_train, data_test, input_shape, num_classes
     #return (x_train, y_train), (x_test, y_test), input_shape, num_classes

@@ -121,8 +121,8 @@ def bottleneck_block(filters, init_strides=1, is_first_block_of_first_layer=Fals
         else:
             conv1 = bn_relu_conv(nb_filter=filters, kernel_size=1,
                                   strides=init_strides)(input)
-
-        conv3 = bn_relu_conv(nb_filter=filters, kernel_size=3)(conv1)
+        conv2 = bn_relu_conv(nb_filter=filters, kernel_size=3)(conv1)
+        conv3 = bn_relu_conv(nb_filter=filters, kernel_size=3)(conv2)
         residual = bn_relu_conv(nb_filter=filters*4, kernel_size=1, strides=init_strides)(conv3)
         return shortcut(input, residual)
 
@@ -207,7 +207,7 @@ class ResnetBuilder(object):
         pool1 = keras.layers.MaxPooling1D(pool_size=3, strides=2, padding="same")(conv1)
         print(pool1.shape)
         block = pool1
-        filters = 64
+        filters = 32
         for i, r in enumerate(repetitions):
             print(i, r)
             block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0), block_func=block_func)(block)

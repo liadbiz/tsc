@@ -55,7 +55,7 @@ def train_scratch(model_name):
                                                patience=opt.train.stop_patience, verbose=1,
                                                restore_best_weights=True)
     #callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
-    callbacks = [lr_scheduler, tensorboard]
+    callbacks = [lr_scheduler, tensorboard, early_stop]
     for dataset_name in opt.dataset.test_dataset_names:
         # get data
         logger.info('============loading data============')

@@ -185,18 +185,6 @@ def residual_block(filters, repetitions, is_first_layer, block_func):
 
     return f
 
-def build_resnet18(input_shape, num_classes):
-    repetitions = [2, 2, 2, 2]
-    return ResnetBuilder.build(input_shape, num_classes, 'basic'，repetitions)
-
-def build_resnet34(input_shape, num_classes):
-    repetitions = [3, 4, 6, 3]
-    return ResnetBuilder.build(input_shape, num_classes, 'basic', repetitions)
-
-def build_resnet50(input_shape, num_classes):
-    repetitions = [3, 4, 6, 3]
-        return ResnetBuilder.build(input_shape, num_classes, 'bottleneck', repetitions)
-
 class ResnetBuilder(object):
     @staticmethod
     def build(input_shape, num_classes, block_func, repetitions):
@@ -204,6 +192,7 @@ class ResnetBuilder(object):
 
         :param input_shape: input shape of input data
         :param num_classes: number of class in final softmax layer
+        :param block_func block function name
         :param repetitions: number of repetitions of each block
         :return: a keras model
         """
@@ -213,13 +202,25 @@ class ResnetBuilder(object):
         block = pool1
         filters = 16
         for i, r in enumerate(repetitions):
-            block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0), block_func)(block)
+            block = residual_block(filters=filters, repetitions=r, is_first_layer=(i == 0), block_func=block_func)(block)
             filters *= 2
         block = bn_relu(block)
         full = keras.layers.GlobalAveragePooling1D()(block)
         out = keras.layers.Dense(num_classes, activation='softmax')(full)
         print('        -- model was built.')
         return input, out
+
+def build_resnet18(input_shape, num_classes):
+    repetitions = [2, 2, 2, 2]
+    return ResnetBuilder.build(input_shape, num_classes, 'basic', repetitions)
+
+def build_resnet34(input_shape, num_classes):
+    repetitions = [3, 4, 6, 3]
+    return ResnetBuilder.build(input_shape, num_classes, 'basic', repetitions)
+
+def build_resnet50(input_shape, num_classes):
+    repetitions = [3, 4, 6, 3]
+    return ResnetBuilder.build(input_shape, num_classes, 'bottleneck', repetitions)
 
 
 

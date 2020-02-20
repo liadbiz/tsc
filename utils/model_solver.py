@@ -10,6 +10,8 @@
 import tensorflow as tf
 import time
 import numpy as np
+import pandas as pd
+
 class Solver(object):
     def __init__(self, opt, model, dataset_name, num_classes):
         self.opt = opt
@@ -48,6 +50,8 @@ class Solver(object):
         print('duration of training dataset {0} is {1}'.format(self.dataset_name, duration))
 
         print('min validate accuracy: {0}'.format(np.max(history.history['val_categorical_accuracy'])))
+        res = pd.DataFrame(history.history)
+        res.to_csv()
 
 
 

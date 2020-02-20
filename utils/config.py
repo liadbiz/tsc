@@ -44,7 +44,7 @@ __C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'Bi
                             'SyntheticControl', 'ToeSegmentation1', 'ToeSegmentation2', 'Trace', 'TwoLeadECG',
                             'TwoPatterns', 'UWaveGestureLibraryAll', 'UWaveGestureLibraryX', 'UWaveGestureLibraryY',
                             'UWaveGestureLibraryZ', 'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
-__C.dataset.test_dataset_names = ['Adiac']
+#__C.dataset.test_dataset_names = ['Adiac']
 __C.model = edict()
 __C.model.name = "ResNet"
 __C.model.num_layers = 5

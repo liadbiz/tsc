@@ -21,7 +21,7 @@ def build_fcn(input_shape, num_classes):
     conv4 = keras.layers.BatchNormalization()(conv4)
     conv4 = keras.layers.Activation('relu')(conv4)
 
-    full = keras.layers.GlobalAveragePooling1D()(conv3)
+    full = keras.layers.GlobalAveragePooling1D()(conv4)
     out = keras.layers.Dense(num_classes, activation='softmax')(full)
 
     return x, out

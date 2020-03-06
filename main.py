@@ -14,6 +14,7 @@ from utils.config import opt
 
 from models.TSCNet import TSCNet
 from models.ResNet import *
+from models.FCNLSTM import lstmfcn
 from models.FCN import build_fcn
 from utils.data_loader import load_data
 from utils.model_solver import Solver
@@ -85,6 +86,9 @@ def train_scratch(model_name):
             model = keras.models.Model(inputs=x, outputs=y)
         elif opt.model.name == 'ResNet50':
             x, y = build_resnet50(input_shape, num_classes)
+            model = keras.models.Model(inputs=x, outputs=y)
+        elif opt.model.name == "lstmfcn":
+            x, y = build_lstmfcn(input_shape, num_classes, num_cells=8)
             model = keras.models.Model(inputs=x, outputs=y)
         # summary model
         model.summary()

@@ -4,7 +4,7 @@ def build_lstmfcn(input_shape, num_classes, num_cells):
     ip = keras.layers.Input(shape=input_shape)
 
     x = keras.layers.LSTM(num_cells)(ip)
-    x = keras.layers.Dropout(0.8)(x)
+    x = keras.layers.Dropout(0.2)(x)
 
     y = keras.layers.Permute((2, 1))(ip)
     y = keras.layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(y)

@@ -14,7 +14,7 @@ from utils.config import opt
 
 from models.TSCNet import TSCNet
 from models.ResNet import *
-from models.FCNLSTM import lstmfcn
+from models.FCNLSTM import build_lstmfcn
 from models.FCN import build_fcn
 from utils.data_loader import load_data
 from utils.model_solver import Solver

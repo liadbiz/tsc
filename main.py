@@ -67,6 +67,7 @@ def train_scratch(model_name):
         if model_name != opt.model.name:
             opt.model.name = model_name
         # get model
+        model = None
         if opt.model.name == 'TSCNet':
             model = TSCNet(num_classes, opt.model.num_layers)
         elif opt.model.name == 'ResNet':
@@ -91,7 +92,8 @@ def train_scratch(model_name):
             x, y = build_fcnlstm(input_shape, num_classes, num_cells=8)
             model = keras.models.Model(inputs=x, outputs=y)
         # summary model
-        model.summary()
+        if model:
+            model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)
         solver.fit(train_data=train_data, test_data=test_data, optimizer=optimizer, criterion=criterion,
                    callbacks=callbacks, metric=metric)

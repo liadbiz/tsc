@@ -1,6 +1,6 @@
 from tensorflow import keras
 
-def build_lstmfcn(input_shape, num_classes, num_cells):
+def build_fcnlstm(input_shape, num_classes, num_cells):
     ip = keras.layers.Input(shape=input_shape)
 
     x = keras.layers.Permute((2, 1))(ip)
@@ -24,5 +24,5 @@ def build_lstmfcn(input_shape, num_classes, num_cells):
 
     #x = keras.layers.concatenate([x, y])
 
-    out = keras.layers.Dense(num_classes, activation='softmax')(x)
+    out = keras.layers.Dense(num_classes, activation='softmax')(y)
     return ip, out

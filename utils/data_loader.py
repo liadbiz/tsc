@@ -15,7 +15,7 @@ import matplotlib
 import random
 from utils.config import opt
 import tensorflow as tf
-import tensorflow.keras as keras
+from tensorflow import keras
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 

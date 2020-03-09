@@ -21,8 +21,8 @@ def build_fcnlstm(input_shape, num_classes, num_cells):
     y = keras.layers.Activation('relu')(y)
 
     y = keras.layers.GlobalAveragePooling1D()(y)
-
+    print(x.shape)
     x = keras.layers.concatenate([x, y])
-
+    print(x.shape, y.shape)
     out = keras.layers.Dense(num_classes, activation='softmax')(y)
     return ip, out

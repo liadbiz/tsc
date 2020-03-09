@@ -92,6 +92,7 @@ def train_scratch(model_name):
             x, y = build_fcnlstm(input_shape, num_classes, num_cells=8)
             model = keras.models.Model(inputs=x, outputs=y)
         # summary model
+        print('model builed!')
         if model:
             model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)

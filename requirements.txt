@@ -1,0 +1,7 @@
+pyyaml
+easydict
+pandas
+matplotlib
+scikit-learn
+numpy==1.16.3
+

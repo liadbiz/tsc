@@ -1,5 +1,5 @@
 from tensorflow import keras
-from keras.regularizers import l2
+from tensorflow.keras.regularizers import l2
 
 def build_resnet(input_shape, n_feature_maps, nb_classes):
     x = keras.layers.Input(shape=(input_shape))

@@ -102,6 +102,7 @@ def train_scratch(model_name):
         solver.evaluate(ted)
 
         # fine-tune model here
+        print("===============fine-tune start===============")
         initial_lr = 0.001
         initial_bs = 128
         for i in range(5):

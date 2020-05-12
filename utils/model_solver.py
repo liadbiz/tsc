@@ -19,7 +19,7 @@ class Solver(object):
         self.dataset_name = dataset_name
         self.num_classes = num_classes
 
-    def fit(self, train_data, test_data,  optimizer, criterion, callbacks, metric):
+    def fit(self, train_data, test_data, batch_size, optimizer, criterion, callbacks, metric):
         # train
         start_time = time.time()
         """ low level handling, not working for now, use build-in training process instead.
@@ -43,7 +43,7 @@ class Solver(object):
         #x_train, y_train = train_data
         self.model.compile(optimizer=optimizer, loss=criterion, metrics=[metric])
         #self.model.fit(x_train, y_train, batch_size=self.opt.train.batch_size, validation_split=0.2, epochs=self.opt.train.num_epochs)
-        history = self.model.fit(train_data, validation_data=test_data, epochs=self.opt.train.num_epochs, callbacks=callbacks)
+        history = self.model.fit(train_data, validation_data=test_data, batch_size=batch_size, epochs=self.opt.train.num_epochs, callbacks=callbacks)
 
         end_time = time.time()
         duration = end_time - start_time

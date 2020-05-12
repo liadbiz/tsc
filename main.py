@@ -48,15 +48,15 @@ def train_scratch(model_name):
     lr_scheduler = keras.callbacks.ReduceLROnPlateau(monitor=opt.train.monitor, factor=opt.train.lr_factor,
                                                      patience=opt.train.lr_patience, min_lr=opt.train.lr_min_lr,
                                                      verbose=1)
-    checkpoint = keras.callbacks.ModelCheckpoint(filepath='results/models/best_model.h5', save_best_only=False,
-                                                 monitor='val_loss', verbose=1)
-    tensorboard = keras.callbacks.TensorBoard(log_dir='results/tensorboard_logs', update_freq='epoch')
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.train.checkpoint_path, save_best_only=False, mode='max',
+                                                 save_weights_only=True, monitor='val_acc', verbose=1)
+    tensorboard = keras.callbacks.TensorBoard(log_dir=opt.train.log_dir, update_freq='epoch')
     csv_logger =keras.callbacks.CSVLogger('results/logs/training.log')
     early_stop = keras.callbacks.EarlyStopping(monitor=opt.train.monitor, min_delta=opt.train.stop_min_delta,
                                                patience=opt.train.stop_patience, verbose=1,
                                                restore_best_weights=True)
     #callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
-    callbacks = [lr_scheduler, early_stop]
+    callbacks = [lr_scheduler, early_stop, checkpoint]
     for dataset_name in opt.dataset.test_dataset_names:
         # get data
         logger.info('============loading data============')
@@ -96,9 +96,38 @@ def train_scratch(model_name):
         if model:
             model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)
-        solver.fit(train_data=train_data, test_data=test_data, optimizer=optimizer, criterion=criterion,
+        solver.fit(train_data=train_data, test_data=test_data, batch_size=opt.train.batch_size, optimizer=optimizer, criterion=criterion,
                    callbacks=callbacks, metric=metric)
         solver.evaluate(test_data)
+
+        # fine-tune model here
+        initial_lr = 0.001
+        initial_bs = 128
+        for i in range(5):
+            if initial_lr < 0.0001 or initial_bs < 32:
+                break
+            if i != 0:
+                model.load_weights(opt.ft.modelweights_path)
+            else:
+                model.load_weights(opt.train.checkpoint_path)
+            optimizer = keras.optimizers.Adam(lr=initial_lr)
+            solver = Solver(opt, model, dataset_name, num_classes)
+            solver.fit(train_data=train_data, test_data=test_data, batch_size=initial_bs,
+                       optimizer=optimizer, criterion=criterion,
+                       callbacks=callbacks, metric=metric)
+            checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path, save_best_only=False,
+                                                         mode='max',
+                                                         save_weights_only=True, monitor='val_acc', verbose=1)
+            callbacks = [lr_scheduler, early_stop, checkpoint]
+            initial_lr /= 2
+            initial_bs /= 2
+
+        print("=========after fine tune:==========")
+        model.load_weights(opt.ft.modelweights_path)
+        solver = Solver(opt, model, dataset_name, num_classes)
+        solver.evaluate(test_data)
+
+
 
 
 # pre-train model for transfer learning

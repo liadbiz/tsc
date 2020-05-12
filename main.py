@@ -96,7 +96,8 @@ def train_scratch(model_name):
         if model:
             model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)
-        solver.fit(train_data=train_data, test_data=test_data, batch_size=opt.train.batch_size, optimizer=optimizer, criterion=criterion,
+        trd, ted = train_data.batch(opt.train.batch_size), test_data.batch(opt.train.batch_size)
+        solver.fit(train_data=trd, test_data=ted, optimizer=optimizer, criterion=criterion,
                    callbacks=callbacks, metric=metric)
         solver.evaluate(test_data)
 
@@ -112,7 +113,8 @@ def train_scratch(model_name):
                 model.load_weights(opt.train.checkpoint_path)
             optimizer = keras.optimizers.Adam(lr=initial_lr)
             solver = Solver(opt, model, dataset_name, num_classes)
-            solver.fit(train_data=train_data, test_data=test_data, batch_size=initial_bs,
+            trd, ted = train_data.batch(initial_bs), test_data.batch(initial_bs)
+            solver.fit(train_data=trd, test_data=ted,
                        optimizer=optimizer, criterion=criterion,
                        callbacks=callbacks, metric=metric)
             checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path, save_best_only=False,

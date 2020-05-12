@@ -65,4 +65,5 @@ __C.train.gpus = '0'
 __C.train.checkpoint_path = 'results/checkpoints'
 __C.train.log_dir = 'results/logs'
 
+__C.ft = edict()
 __C.ft.modelweights_path = 'results/weights'

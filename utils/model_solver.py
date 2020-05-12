@@ -49,9 +49,8 @@ class Solver(object):
         duration = end_time - start_time
         print('duration of training dataset {0} is {1}'.format(self.dataset_name, duration))
 
-        print('min validate accuracy: {0}'.format(np.max(history.history['val_categorical_accuracy'])))
-        res = pd.DataFrame(history.history)
-        res.to_csv()
+        print('max validate accuracy: {0}'.format(np.max(history.history['val_categorical_accuracy'])))
+
 
 
 
@@ -65,3 +64,4 @@ class Solver(object):
         # use best model in training process
         results = self.model.evaluate(test_data)
         print('test loss, test acc:', results)
+        return results

@@ -9,6 +9,7 @@
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import tensorflow as tf
+import os
 from tensorflow import keras
 from utils.config import opt
 
@@ -57,6 +58,16 @@ def train_scratch(model_name):
                                                restore_best_weights=True)
     #callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
     callbacks = [lr_scheduler, early_stop, checkpoint]
+
+    result_scratch_file = './results/result_scratch.csv'
+    result_finetune_file = './results/result_finetune.csv'
+
+    with open(result_scratch_file, 'w') as f:
+        f.write('dataset_name,{0}'.format(opt.model.name))
+
+    with open(result_scratch_file, 'w') as f:
+        f.write('dataset_name,{0}'.format(opt.model.name))
+
     for dataset_name in opt.dataset.test_dataset_names:
         # get data
         logger.info('============loading data============')
@@ -99,7 +110,10 @@ def train_scratch(model_name):
         trd, ted = train_data.batch(opt.train.batch_size), test_data.batch(opt.train.batch_size)
         solver.fit(train_data=trd, test_data=ted, optimizer=optimizer, criterion=criterion,
                    callbacks=callbacks, metric=metric)
-        solver.evaluate(ted)
+        _, acc = solver.evaluate(ted)
+
+        with open(result_scratch_file, 'w') as f:
+            f.write('{0},{1}'.format(dataset_name, acc))
 
         # fine-tune model here
         print("===============fine-tune start===============")
@@ -115,20 +129,23 @@ def train_scratch(model_name):
             optimizer = keras.optimizers.Adam(lr=initial_lr)
             solver = Solver(opt, model, dataset_name, num_classes)
             trd, ted = train_data.batch(initial_bs), test_data.batch(initial_bs)
-            solver.fit(train_data=trd, test_data=ted,
-                       optimizer=optimizer, criterion=criterion,
-                       callbacks=callbacks, metric=metric)
             checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path, save_best_only=False,
                                                          mode='max',
                                                          save_weights_only=True, monitor='val_acc', verbose=1)
             callbacks = [lr_scheduler, early_stop, checkpoint]
+            solver.fit(train_data=trd, test_data=ted,
+                       optimizer=optimizer, criterion=criterion,
+                       callbacks=callbacks, metric=metric)
+
             initial_lr /= 2
             initial_bs /= 2
 
         print("=========after fine tune:==========")
         model.load_weights(opt.ft.modelweights_path)
         solver = Solver(opt, model, dataset_name, num_classes)
-        solver.evaluate(ted)
+        _, acc = solver.evaluate(ted)
+        with open(result_finetune_file, 'w') as f:
+            f.write('{0},{1}'.format(dataset_name, acc))
 
 
 

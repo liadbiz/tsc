@@ -138,7 +138,7 @@ def train_scratch(model_name):
                        callbacks=callbacks, metric=metric)
 
             initial_lr /= 2
-            initial_bs /= 2
+            initial_bs //= 2
 
         print("=========after fine tune:==========")
         model.load_weights(opt.ft.modelweights_path)

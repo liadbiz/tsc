@@ -99,7 +99,7 @@ def train_scratch(model_name):
         trd, ted = train_data.batch(opt.train.batch_size), test_data.batch(opt.train.batch_size)
         solver.fit(train_data=trd, test_data=ted, optimizer=optimizer, criterion=criterion,
                    callbacks=callbacks, metric=metric)
-        solver.evaluate(test_data)
+        solver.evaluate(ted)
 
         # fine-tune model here
         initial_lr = 0.001
@@ -127,7 +127,7 @@ def train_scratch(model_name):
         print("=========after fine tune:==========")
         model.load_weights(opt.ft.modelweights_path)
         solver = Solver(opt, model, dataset_name, num_classes)
-        solver.evaluate(test_data)
+        solver.evaluate(ted)
 
 
 

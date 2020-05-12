@@ -62,8 +62,8 @@ __C.train.stop_min_delta = 0.0001
 __C.train.num_epochs = 1500
 __C.train.batch_size = 128
 __C.train.gpus = '0'
-__C.train.checkpoint_path = 'results/checkpoints'
-__C.train.log_dir = 'results/logs'
+__C.train.checkpoint_path = './results/checkpoints'
+__C.train.log_dir = './results/logs'
 
 __C.ft = edict()
 __C.ft.modelweights_path = 'results/weights'

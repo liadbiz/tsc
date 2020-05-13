@@ -71,7 +71,7 @@ def train_scratch(model_name):
     for dataset_name in opt.dataset.test_dataset_names:
         # get data
         logger.info('============loading data============')
-        train_data, test_data, input_shape, num_classes = load_data(opt, dataset_name)
+        train_data, test_data, input_shape, num_classes, batch_size = load_data(opt, dataset_name)
         #lb = LabelBinarizer()
         #y_train_onehot = lb.fit_transform(y_train)
         logger.info(('===========Done==============='))
@@ -107,7 +107,7 @@ def train_scratch(model_name):
         if model:
             model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)
-        batch_size = int(min(train_data.shape[0] / 10, opt.train.batch_size))
+        #batch_size = int(min(train_data.shape[0] / 10, opt.train.batch_size))
         trd, ted = train_data.batch(batch_size), test_data.batch(batch_size)
         solver.fit(train_data=trd, test_data=ted, optimizer=optimizer, criterion=criterion,
                    callbacks=callbacks, metric=metric)

@@ -128,13 +128,13 @@ def train_scratch(model_name):
             if initial_lr < 0.0001 or initial_bs < 32:
                 break
             if i != 0:
-                model.load_weights(opt.ft.modelweights_path+dataset_name)
+                model.load_weights(opt.ft.modelweights_path+'_'+dataset_name)
             else:
-                model.load_weights(opt.train.checkpoint_path+dataset_name)
+                model.load_weights(opt.train.checkpoint_path+'_'+dataset_name)
             optimizer = keras.optimizers.Adam(lr=initial_lr)
             solver = Solver(opt, model, dataset_name, num_classes)
             trd, ted = train_data.batch(initial_bs), test_data.batch(initial_bs)
-            checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path + dataset_name, save_best_only=True,
+            checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path + '_' + dataset_name, save_best_only=True,
                                                          mode='max',
                                                          save_weights_only=True, monitor='val_categorical_accuracy', verbose=1)
             callbacks = [lr_scheduler, early_stop, checkpoint]

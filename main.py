@@ -107,7 +107,8 @@ def train_scratch(model_name):
         if model:
             model.summary()
         solver = Solver(opt, model, dataset_name, num_classes)
-        trd, ted = train_data.batch(opt.train.batch_size), test_data.batch(opt.train.batch_size)
+        batch_size = int(min(train_data.shape[0] / 10, opt.train.batch_size))
+        trd, ted = train_data.batch(batch_size), test_data.batch(batch_size)
         solver.fit(train_data=trd, test_data=ted, optimizer=optimizer, criterion=criterion,
                    callbacks=callbacks, metric=metric)
         _, acc = solver.evaluate(ted)

@@ -146,7 +146,7 @@ def train_scratch(model_name):
             initial_bs //= 2
 
         print("=========after fine tune:==========")
-        model.load_weights(opt.ft.modelweights_path)
+        model.load_weights(opt.ft.modelweights_path + '_' + dataset_name)
         solver = Solver(opt, model, dataset_name, num_classes)
         _, acc = solver.evaluate(ted)
         with open(result_finetune_file, 'a') as f:

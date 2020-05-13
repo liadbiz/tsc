@@ -45,10 +45,10 @@ def train_scratch(model_name):
     result_finetune_file = './results/result_finetune.csv'
 
     with open(result_scratch_file, 'a') as f:
-        f.write('dataset_name,{0}'.format(opt.model.name))
+        f.write('dataset_name,{0}\n'.format(opt.model.name))
 
     with open(result_scratch_file, 'a') as f:
-        f.write('dataset_name,{0}'.format(opt.model.name))
+        f.write('dataset_name,{0}\n'.format(opt.model.name))
 
     for dataset_name in opt.dataset.test_dataset_names:
         optimizer = getattr(keras.optimizers, opt.train.optimizer)()
@@ -118,7 +118,7 @@ def train_scratch(model_name):
         _, acc = solver.evaluate(ted)
 
         with open(result_scratch_file, 'a') as f:
-            f.write('{0},{1}'.format(dataset_name, acc))
+            f.write('{0},{1}\n'.format(dataset_name, acc))
 
         # fine-tune model here
         print("===============fine-tune start===============")
@@ -150,7 +150,7 @@ def train_scratch(model_name):
         solver = Solver(opt, model, dataset_name, num_classes)
         _, acc = solver.evaluate(ted)
         with open(result_finetune_file, 'a') as f:
-            f.write('{0},{1}'.format(dataset_name, acc))
+            f.write('{0},{1}\n'.format(dataset_name, acc))
 
 
 

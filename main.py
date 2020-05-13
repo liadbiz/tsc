@@ -127,7 +127,7 @@ def train_scratch(model_name):
                 model.load_weights(opt.ft.modelweights_path)
             else:
                 model.load_weights(opt.train.checkpoint_path)
-            optimizer = keras.optimizers.Adam(lr=initial_lr)
+            optimizer = keras.optimizers.SGD(lr=initial_lr)
             solver = Solver(opt, model, dataset_name, num_classes)
             trd, ted = train_data.batch(initial_bs), test_data.batch(initial_bs)
             checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path, save_best_only=False,

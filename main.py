@@ -41,36 +41,40 @@ logger.addHandler(sh)
 
 # train model from scratch
 def train_scratch(model_name):
-    optimizer = getattr(keras.optimizers, opt.train.optimizer)()
-    criterion = keras.losses.CategoricalCrossentropy()
-    metric = keras.metrics.CategoricalAccuracy()
-    # val_metric = keras.metrics.CategoricalAccuracy()
-
-    lr_scheduler = keras.callbacks.ReduceLROnPlateau(monitor=opt.train.monitor, factor=opt.train.lr_factor,
-                                                     patience=opt.train.lr_patience, min_lr=opt.train.lr_min_lr,
-                                                     verbose=1)
-    checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.train.checkpoint_path, save_best_only=True, mode='max',
-                                                 save_weights_only=True, monitor='val_categorical_accuracy', verbose=1)
-    tensorboard = keras.callbacks.TensorBoard(log_dir=opt.train.log_dir, update_freq='epoch')
-    csv_logger =keras.callbacks.CSVLogger('results/logs/training.log')
-    early_stop = keras.callbacks.EarlyStopping(monitor=opt.train.monitor, min_delta=opt.train.stop_min_delta,
-                                               patience=opt.train.stop_patience, verbose=1,
-                                               restore_best_weights=True)
-    #callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
-    callbacks = [lr_scheduler, early_stop, checkpoint]
-
     result_scratch_file = './results/result_scratch.csv'
     result_finetune_file = './results/result_finetune.csv'
 
-    with open(result_scratch_file, 'w') as f:
+    with open(result_scratch_file, 'a+') as f:
         f.write('dataset_name,{0}'.format(opt.model.name))
 
-    with open(result_scratch_file, 'w') as f:
+    with open(result_scratch_file, 'a+') as f:
         f.write('dataset_name,{0}'.format(opt.model.name))
 
     for dataset_name in opt.dataset.test_dataset_names:
+        optimizer = getattr(keras.optimizers, opt.train.optimizer)()
+        criterion = keras.losses.CategoricalCrossentropy()
+        metric = keras.metrics.CategoricalAccuracy()
+        # val_metric = keras.metrics.CategoricalAccuracy()
+
+        lr_scheduler = keras.callbacks.ReduceLROnPlateau(monitor=opt.train.monitor, factor=opt.train.lr_factor,
+                                                         patience=opt.train.lr_patience, min_lr=opt.train.lr_min_lr,
+                                                         verbose=1)
+        checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.train.checkpoint_path + '_' + dataset_name,
+                                                     save_best_only=True,
+                                                     mode='max',
+                                                     save_weights_only=True, monitor='val_categorical_accuracy',
+                                                     verbose=1)
+        tensorboard = keras.callbacks.TensorBoard(log_dir=opt.train.log_dir, update_freq='epoch')
+        csv_logger = keras.callbacks.CSVLogger('results/logs/training.log')
+        early_stop = keras.callbacks.EarlyStopping(monitor=opt.train.monitor, min_delta=opt.train.stop_min_delta,
+                                                   patience=opt.train.stop_patience, verbose=1,
+                                                   restore_best_weights=True)
+        # callbacks = [lr_scheduler, tensorboard, csv_logger, early_stop]
+        callbacks = [lr_scheduler, early_stop, checkpoint]
+
+
         # get data
-        logger.info('============loading data============')
+        logger.info('============loading data {0}============'.format(dataset_name))
         train_data, test_data, input_shape, num_classes, batch_size = load_data(opt, dataset_name)
         #lb = LabelBinarizer()
         #y_train_onehot = lb.fit_transform(y_train)
@@ -130,7 +134,7 @@ def train_scratch(model_name):
             optimizer = keras.optimizers.Adam(lr=initial_lr)
             solver = Solver(opt, model, dataset_name, num_classes)
             trd, ted = train_data.batch(initial_bs), test_data.batch(initial_bs)
-            checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path, save_best_only=True,
+            checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path + dataset_name, save_best_only=True,
                                                          mode='max',
                                                          save_weights_only=True, monitor='val_categorical_accuracy', verbose=1)
             callbacks = [lr_scheduler, early_stop, checkpoint]

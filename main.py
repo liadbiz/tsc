@@ -49,8 +49,8 @@ def train_scratch(model_name):
     lr_scheduler = keras.callbacks.ReduceLROnPlateau(monitor=opt.train.monitor, factor=opt.train.lr_factor,
                                                      patience=opt.train.lr_patience, min_lr=opt.train.lr_min_lr,
                                                      verbose=1)
-    checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.train.checkpoint_path, save_best_only=False, mode='max',
-                                                 save_weights_only=True, monitor='val_acc', verbose=1)
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.train.checkpoint_path, save_best_only=True, mode='max',
+                                                 save_weights_only=True, monitor='val_categorical_accuracy', verbose=1)
     tensorboard = keras.callbacks.TensorBoard(log_dir=opt.train.log_dir, update_freq='epoch')
     csv_logger =keras.callbacks.CSVLogger('results/logs/training.log')
     early_stop = keras.callbacks.EarlyStopping(monitor=opt.train.monitor, min_delta=opt.train.stop_min_delta,
@@ -130,9 +130,9 @@ def train_scratch(model_name):
             optimizer = keras.optimizers.Adam(lr=initial_lr)
             solver = Solver(opt, model, dataset_name, num_classes)
             trd, ted = train_data.batch(initial_bs), test_data.batch(initial_bs)
-            checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path, save_best_only=False,
+            checkpoint = keras.callbacks.ModelCheckpoint(filepath=opt.ft.modelweights_path, save_best_only=True,
                                                          mode='max',
-                                                         save_weights_only=True, monitor='val_acc', verbose=1)
+                                                         save_weights_only=True, monitor='val_categorical_accuracy', verbose=1)
             callbacks = [lr_scheduler, early_stop, checkpoint]
             solver.fit(train_data=trd, test_data=ted,
                        optimizer=optimizer, criterion=criterion,

@@ -44,10 +44,10 @@ def train_scratch(model_name):
     result_scratch_file = './results/result_scratch.csv'
     result_finetune_file = './results/result_finetune.csv'
 
-    with open(result_scratch_file, 'a+') as f:
+    with open(result_scratch_file, 'a') as f:
         f.write('dataset_name,{0}'.format(opt.model.name))
 
-    with open(result_scratch_file, 'a+') as f:
+    with open(result_scratch_file, 'a') as f:
         f.write('dataset_name,{0}'.format(opt.model.name))
 
     for dataset_name in opt.dataset.test_dataset_names:
@@ -117,7 +117,7 @@ def train_scratch(model_name):
                    callbacks=callbacks, metric=metric)
         _, acc = solver.evaluate(ted)
 
-        with open(result_scratch_file, 'w') as f:
+        with open(result_scratch_file, 'a') as f:
             f.write('{0},{1}'.format(dataset_name, acc))
 
         # fine-tune model here
@@ -128,9 +128,9 @@ def train_scratch(model_name):
             if initial_lr < 0.0001 or initial_bs < 32:
                 break
             if i != 0:
-                model.load_weights(opt.ft.modelweights_path)
+                model.load_weights(opt.ft.modelweights_path+dataset_name)
             else:
-                model.load_weights(opt.train.checkpoint_path)
+                model.load_weights(opt.train.checkpoint_path+dataset_name)
             optimizer = keras.optimizers.Adam(lr=initial_lr)
             solver = Solver(opt, model, dataset_name, num_classes)
             trd, ted = train_data.batch(initial_bs), test_data.batch(initial_bs)
@@ -149,7 +149,7 @@ def train_scratch(model_name):
         model.load_weights(opt.ft.modelweights_path)
         solver = Solver(opt, model, dataset_name, num_classes)
         _, acc = solver.evaluate(ted)
-        with open(result_finetune_file, 'w') as f:
+        with open(result_finetune_file, 'a') as f:
             f.write('{0},{1}'.format(dataset_name, acc))
 
 

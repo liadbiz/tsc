@@ -4,7 +4,7 @@ from tensorflow.keras import layers
 from tensorflow.keras import activations
 from tensorflow.keras import initializers
 from tensorflow.keras import regularizers
-from tenorflow.keras import constraints
+from tensorflow.keras import constraints
 from tensorflow.keras import backend as K
 
 class AttentionLSTMCell(layers.Layer):
@@ -509,15 +509,15 @@ class AttentionLSTM(layers.RNN):
         return cls(**config)
 
 
-def build_fcnalstm(MAX_SEQUENCE_LENGTH, NB_CLASS, NUM_CELLS=8):
+def build_fcnalstm(input_shape, nb_class, num_cells=8):
 
-    ip = layers.Input(shape=(1, MAX_SEQUENCE_LENGTH))
+    ip = layers.Input(shape=input_shape)
 
-    x = layers.AttentionLSTM(NUM_CELLS)(ip)
+    x = layers.Permute((2,1))(ip)
+    x = layers.AttentionLSTM(num_cells)(x)
     x = layers.Dropout(0.8)(x)
 
-    y = layers.Permute((2, 1))(ip)
-    y = layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(y)
+    y = layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(ip)
     y = layers.BatchNormalization()(y)
     y = layers.Activation('relu')(y)
 
@@ -533,6 +533,6 @@ def build_fcnalstm(MAX_SEQUENCE_LENGTH, NB_CLASS, NUM_CELLS=8):
 
     x = layers.concatenate([x, y])
 
-    out = layers.Dense(NB_CLASS, activation='softmax')(x)
+    out = layers.Dense(nb_class, activation='softmax')(x)
 
     return ip, out

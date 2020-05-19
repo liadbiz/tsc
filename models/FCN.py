@@ -17,13 +17,13 @@ def build_fcn(input_shape, num_classes):
     conv3 = keras.layers.BatchNormalization()(conv3)
     conv3 = keras.layers.Activation('relu')(conv3)
 
-    conv4 = keras.layers.Conv1D(512, 3, 1, padding='same')(conv3)
-    conv4 = keras.layers.BatchNormalization()(conv4)
-    conv4 = keras.layers.Activation('relu')(conv4)
+    #conv4 = keras.layers.Conv1D(512, 3, 1, padding='same')(conv3)
+    #conv4 = keras.layers.BatchNormalization()(conv4)
+    #conv4 = keras.layers.Activation('relu')(conv4)
 
-    full = keras.layers.GlobalAveragePooling1D()(conv4)
+    full = keras.layers.GlobalAveragePooling1D()(conv3)
 
-    full = keras.layers.Dropout(0.2)(full)
+    #full = keras.layers.Dropout(0.2)(full)
     out = keras.layers.Dense(num_classes, activation='softmax')(full)
 
     return x, out

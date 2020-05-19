@@ -46,12 +46,12 @@ __C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'Bi
                             'UWaveGestureLibraryZ', 'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
 __C.dataset.test_dataset_names = ['Adiac']
 __C.model = edict()
-__C.model.name = "ResNet"
+__C.model.name = "FCN"
 __C.model.num_layers = 5
 
 __C.train = edict()
 __C.train.optimizer = 'Adam'
-__C.train.lr = 0.01
+__C.train.lr = 0.001
 __C.train.lr_factor = 0.5
 __C.train.lr_patience = 50
 __C.train.lr_min_lr = 0.0001

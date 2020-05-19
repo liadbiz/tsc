@@ -45,9 +45,13 @@ def train_scratch(model_name):
     result_finetune_file = './results/result_finetune.csv'
 
     with open(result_scratch_file, 'a') as f:
+        f.seek(0)
+        f.truncate()
         f.write('dataset_name,{0}\n'.format(opt.model.name))
 
     with open(result_finetune_file, 'a') as f:
+        f.seek(0)
+        f.truncate()
         f.write('dataset_name,{0}\n'.format(opt.model.name))
 
     for dataset_name in opt.dataset.test_dataset_names:

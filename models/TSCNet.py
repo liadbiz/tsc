@@ -94,8 +94,9 @@ class ReductionBlk(keras.layers.Layer):
 
 
 class TSCNet(keras.Model):
-    def __init__(self, num_classes, num_layers, bottleneck_channel=16, **kwargs):
+    def __init__(self, input_shape, num_classes, num_layers, bottleneck_channel=16, **kwargs):
         super(TSCNet, self).__init__(**kwargs)
+        self.input_shape = input_shape
         self.bottleneck_channel = bottleneck_channel
         self.num_layers = num_layers
         #self.input_shape = input_shape
@@ -123,6 +124,7 @@ class TSCNet(keras.Model):
         self.fc = keras.layers.Dense(num_classes, activation='softmax')
 
     def call(self, x, training=None):
+        x = keras.layers.Input(shape=(self.input_shape))
         out = self.conv1(x, training=training)
         out = self.conv2(out, training=training)
         out = self.conv3(out, training=training)
@@ -135,5 +137,3 @@ class TSCNet(keras.Model):
 
         return out
 
-def build_tscnet(input_shape, num_classes):
-    x = keras.layers.Input(shape=(input_shape))

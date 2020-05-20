@@ -89,7 +89,7 @@ def train_scratch(model_name):
         # get model
         model = None
         if opt.model.name == 'TSCNet':
-            model = TSCNet(num_classes, opt.model.num_layers)
+            model = TSCNet(input_shape, num_classes, opt.model.num_layers)
         elif opt.model.name == 'ResNet':
             x, y = build_resnet(input_shape, 64, num_classes)
             model = keras.models.Model(inputs=x, outputs=y)

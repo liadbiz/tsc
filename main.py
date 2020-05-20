@@ -55,7 +55,7 @@ def train_scratch(model_name):
         f.truncate()
         f.write('dataset_name,{0}\n'.format(model_name))
 
-    for dataset_name in opt.dataset.test_dataset_names:
+    for dataset_name in opt.dataset.test_dataset_names_44:
         optimizer = getattr(keras.optimizers, opt.train.optimizer)()
         criterion = keras.losses.CategoricalCrossentropy()
         metric = keras.metrics.CategoricalAccuracy()

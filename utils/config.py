@@ -27,7 +27,7 @@ __C.dataset.dataset_path = '../dataset/'
 # test_dataset_names: evaluate
 # train_dataset_names: pre-train
 # valid_dataset_names: validate
-__C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'Car', 'CBF',
+__C.dataset.test_dataset_names_85 = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'BirdChicken', 'Car', 'CBF',
                             'ChlorineConcentration', 'CinCECGTorso', 'Coffee',
                             'Computers', 'CricketX', 'CricketY', 'CricketZ', 'DiatomSizeReduction',
                             'DistalPhalanxOutlineAgeGroup', 'DistalPhalanxOutlineCorrect', 'DistalPhalanxTW',
@@ -44,6 +44,20 @@ __C.dataset.test_dataset_names = ['Adiac', 'ArrowHead', 'Beef', 'BeetleFly', 'Bi
                             'SyntheticControl', 'ToeSegmentation1', 'ToeSegmentation2', 'Trace', 'TwoLeadECG',
                             'TwoPatterns', 'UWaveGestureLibraryAll', 'UWaveGestureLibraryX', 'UWaveGestureLibraryY',
                             'UWaveGestureLibraryZ', 'Wafer', 'Wine', 'WordSynonyms', 'Worms', 'WormsTwoClass', 'Yoga']
+
+__C.dataset.test_dataset_names_44 = ['Adiac',  'Beef',  'CBF',
+                            'ChlorineConcentration', 'CinCECGTorso', 'Coffee',
+                            'CricketX', 'CricketY', 'CricketZ', 'DiatomSizeReduction',
+                            'ECGFiveDays', 'FaceAll', 'FaceFour',
+                            'FacesUCR', 'FiftyWords', 'GunPoint',
+                            'Haptics',  'InlineSkate', 'Lightning2', 'Lightning7', 'Mallat',  'MedicalImages',
+                            'MoteStrain', 'NonInvasiveFetalECGThorax1', 'NonInvasiveFetalECGThorax2', 'OliveOil',
+                            'OSULeaf',  'SonyAIBORobotSurface1',
+                            'SonyAIBORobotSurface2', 'StarLightCurves', 'SwedishLeaf', 'Symbols',
+                            'SyntheticControl',  'Trace', 'TwoLeadECG',
+                            'TwoPatterns',  'UWaveGestureLibraryX', 'UWaveGestureLibraryY',
+                            'UWaveGestureLibraryZ', 'Wafer', 'WordSynonyms', 'Yoga']
+
 __C.dataset.test_dataset_names = ['Adiac']
 __C.model = edict()
 __C.model.name = "FCN"

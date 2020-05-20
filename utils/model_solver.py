@@ -51,8 +51,8 @@ class Solver(object):
 
         print('max validate accuracy: {0}'.format(np.max(history.history['val_categorical_accuracy'])))
 
-
-
+    def load(self, model_path):
+        self.model.load_weights(model_path)
 
     def save(self):
         pass

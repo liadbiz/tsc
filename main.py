@@ -123,6 +123,7 @@ def train_scratch(model_name):
         trd, ted = train_data.batch(batch_size), test_data.batch(batch_size)
         solver.fit(train_data=trd, test_data=ted, optimizer=optimizer, criterion=criterion,
                    callbacks=callbacks, metric=metric)
+        solver.load(opt.train.checkpoint_path+'_'+dataset_name)
         _, acc = solver.evaluate(ted)
 
         with open(result_scratch_file, 'a') as f:

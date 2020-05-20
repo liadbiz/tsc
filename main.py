@@ -128,7 +128,7 @@ def train_scratch(model_name):
 
         with open(result_scratch_file, 'a') as f:
             f.write('{0},{1}\n'.format(dataset_name, acc))
-
+        """
         # fine-tune model here
         print("===============fine-tune start===============")
         initial_lr = 0.001
@@ -161,7 +161,7 @@ def train_scratch(model_name):
         with open(result_finetune_file, 'a') as f:
             f.write('{0},{1}\n'.format(dataset_name, acc))
 
-
+        """
 
 
 # pre-train model for transfer learning

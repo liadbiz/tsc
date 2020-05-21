@@ -109,5 +109,5 @@ def build_fcnablstm(input_shape, num_classes, num_cells=8, dropout_rate=0.3, emb
     print(x.shape)
     x = keras.layers.concatenate([x, y])
     print(x.shape, y.shape)
-    out = keras.layers.Dense(num_classes, activation='softmax')(y)
+    out = keras.layers.Dense(num_classes, activation='softmax')(x)
     return ip, out

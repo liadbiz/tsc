@@ -67,6 +67,7 @@ class AttentionLayer(layers.Layer):
         a = tf.nn.softmax(tf.tensordot(tf.transpose(self.attention_w), m, axes=[0,1]))
         r = tf.tensordot(inputs, tf.transpose(a), axes=[2,0])
         outputs = tf.tanh(r)
+        outputs = tf.squeeze(outputs, axis=[2])
         outputs = self.dropout(outputs, training=training)
         return outputs
 

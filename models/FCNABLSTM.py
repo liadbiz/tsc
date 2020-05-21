@@ -34,9 +34,9 @@ class EmbeddingLayer(layers.Layer):
 
     def call(self, x):
         k_0 = self.w * x + self.b
-        x = K.repeat_elements(x, self.output_dim, -1)
-        k_i = K.sin(K.dot(x, self.W) + self.B)
-        return K.concatenate([k_i, k_0], -1)
+        x = tf.repeat(x, repeats=[self.output_dim], axis=-1)
+        k_i = tf.math.sin(tf.matmul(x, self.W) + self.B)
+        return tf.concat([k_i, k_0], -1)
 
 
 class BiLstmLayer(layers.Layer):
@@ -63,10 +63,10 @@ class AttentionLayer(layers.Layer):
 
 
     def call(self, inputs, training):
-        m = tf.tanh(inputs)
+        m = tf.math.tanh(inputs)
         a = tf.nn.softmax(tf.matmul(tf.transpose(self.attention_w), m))
         r = tf.matmul(inputs, tf.transpose(a, perm=[0, 2, 1]))
-        outputs = tf.tanh(r)
+        outputs = tf.math.tanh(r)
         outputs = tf.squeeze(outputs, axis=[-1])
         outputs = self.dropout(outputs, training=training)
         return outputs

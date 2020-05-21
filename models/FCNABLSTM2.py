@@ -34,9 +34,9 @@ class EmbeddingLayer(layers.Layer):
 
     def call(self, x):
         k_0 = self.w * x + self.b
-        x = K.repeat_elements(x, self.output_dim, -1)
-        k_i = K.sin(K.dot(x, self.W) + self.B)
-        return K.concatenate([k_i, k_0], -1)
+        x = tf.repeat(x, repeats=[self.output_dim], axis=-1)
+        k_i = tf.math.sin(tf.matmul(x, self.W) + self.B)
+        return tf.concat([k_i, k_0], -1)
 
 
 class BiLstmLayer(layers.Layer):
@@ -58,16 +58,16 @@ class AttentionLayer(layers.Layer):
         #self.attention_size = attention_size
 
     def build(self, input_shape):
-        self.attention_w = self.add_weight(name='att_w', shape=(input_shape[-2], ), initializer=tf.random_uniform_initializer(), trainable=True)
+        self.attention_w = self.add_weight(name='att_w', shape=(input_shape[-2], 1), initializer=tf.random_uniform_initializer(), trainable=True)
         super(AttentionLayer, self).build(input_shape)
 
 
     def call(self, inputs, training):
-        m = tf.tanh(inputs)
-        a = tf.nn.softmax(tf.tensordot(tf.transpose(self.attention_w), m, axes=[0,1]))
-        r = tf.tensordot(inputs, tf.transpose(a), axes=[2,0])
-        outputs = tf.tanh(r)
-        outputs = tf.squeeze(outputs, axis=[2])
+        m = tf.math.tanh(inputs)
+        a = tf.nn.softmax(tf.matmul(tf.transpose(self.attention_w), m))
+        r = tf.matmul(inputs, tf.transpose(a, perm=[0, 2, 1]))
+        outputs = tf.math.tanh(r)
+        outputs = tf.squeeze(outputs, axis=[-1])
         outputs = self.dropout(outputs, training=training)
         return outputs
 
@@ -86,13 +86,12 @@ class AttBiLstmModel(Model):
         return out
 
 
-def build_fcnablstm2(input_shape, num_classes, num_cells=8, dropout_rate=0.3, embedding_size=64):
+def build_fcnablstm(input_shape, num_classes, num_cells=8, dropout_rate=0.3, embedding_size=64):
     ip = keras.layers.Input(shape=input_shape)
 
     #x = keras.layers.Permute((2, 1))(ip)
     x = AttBiLstmModel(num_cells=num_cells, dropout_rate=dropout_rate, ts_len=input_shape[-2], embedding_size=embedding_size)(ip)
     #x = keras.layers.Dropout(0.8)(x)
-
 
     out = keras.layers.Dense(num_classes, activation='softmax')(x)
     return ip, out

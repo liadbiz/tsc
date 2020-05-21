@@ -54,7 +54,7 @@ def build_fcnablstm(input_shape, num_classes, num_cells, dropout_rate):
     ip = keras.layers.Input(shape=input_shape)
 
     x = keras.layers.Permute((2, 1))(ip)
-    x = keras.layers.AttBiLstmModel(num_classes, num_cells, dropout_rate)(x)
+    x = keras.layers.AttBiLstmModel(num_classes, num_cells, dropout_rate=0.3)(x)
     #x = keras.layers.Dropout(0.8)(x)
 
     y = keras.layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(ip)

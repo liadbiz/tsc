@@ -18,6 +18,7 @@ from models.ResNet import *
 from models.FCNLSTM import build_fcnlstm
 from models.FCN import build_fcn
 from models.FCNALSTM import build_fcnalstm
+from models.FCNABLSTM import build_fcnablstm
 from utils.data_loader import load_data
 from utils.model_solver import Solver
 import argparse
@@ -113,6 +114,9 @@ def train_scratch(model_name):
             model = keras.models.Model(inputs=x, outputs=y)
         elif opt.model.name == "FCNALSTM":
             x, y = build_fcnalstm(input_shape, num_classes, num_cells=8)
+            model = keras.models.Model(inputs=x, outputs=y)
+        elif opt.model.name == "FCNABLSTM":
+            x, y = build_fcnablstm(input_shape, num_classes, num_cells=8, dropout_rate=0.3)
             model = keras.models.Model(inputs=x, outputs=y)
         # summary model
         print('model builed!')

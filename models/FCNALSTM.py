@@ -562,7 +562,7 @@ def build_fcnalstm(input_shape, nb_class, num_cells=8):
 
     x = layers.Permute((2,1))(ip)
     x = AttentionLSTM(num_cells)(x)
-    x = layers.Dropout(0.8)(x)
+    #x = layers.Dropout(0.2)(x)
 
     y = layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(ip)
     y = layers.BatchNormalization()(y)

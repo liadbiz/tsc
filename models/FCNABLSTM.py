@@ -58,7 +58,7 @@ class AttentionLayer(layers.Layer):
         #self.attention_size = attention_size
 
     def build(self, input_shape):
-        self.attention_w = self.add_weight(name='att_w', shape=(input_shape[-2], ), initializer=tf.random_uniform_initializer(), trainable=True)
+        self.attention_w = self.add_weight(name='att_w', shape=(input_shape[-2], 1), initializer=tf.random_uniform_initializer(), trainable=True)
         super(AttentionLayer, self).build(input_shape)
 
 

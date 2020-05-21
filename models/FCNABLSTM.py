@@ -64,10 +64,10 @@ class AttentionLayer(layers.Layer):
 
     def call(self, inputs, training):
         m = tf.tanh(inputs)
-        a = tf.nn.softmax(tf.tensordot(tf.transpose(self.attention_w), m, axes=[0,1]))
-        r = tf.tensordot(inputs, tf.transpose(a), axes=[2,0])
+        a = tf.nn.softmax(tf.matmul(tf.transpose(self.attention_w), m))
+        r = tf.matmul(inputs, tf.transpose(a, perm=[0, 2, 1]))
         outputs = tf.tanh(r)
-        outputs = tf.squeeze(outputs, axis=[2])
+        outputs = tf.squeeze(outputs, axis=[-1])
         outputs = self.dropout(outputs, training=training)
         return outputs
 

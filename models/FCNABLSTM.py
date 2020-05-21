@@ -64,8 +64,8 @@ class AttentionLayer(layers.Layer):
 
     def call(self, inputs, training):
         m = tf.tanh(inputs)
-        a = tf.nn.softmax(tf.tensordot(tf.transpose(self.attention_w), m, axes=1))
-        r = tf.tensordot(inputs, tf.transpose(a), axes=1)
+        a = tf.nn.softmax(tf.tensordot(tf.transpose(self.attention_w), m, axes=[0,1]))
+        r = tf.tensordot(inputs, tf.transpose(a), axes=[2,0])
         outputs = tf.tanh(r)
         outputs = self.dropout(outputs, training=training)
         return outputs
@@ -78,8 +78,9 @@ class AttBiLstmModel(Model):
         self.embedding_layer = EmbeddingLayer(ts_len, embedding_size)
 
     def call(self, inputs, training):
-        x = self.emdedding_layer(inputs)
+        x = self.embedding_layer(inputs)
         x = self.bilstm_layer(x, training=training)
+        x = keras.layers.Permute((2,1))(x)
         out = self.atten_layer(x, training=training)
         return out
 
@@ -87,8 +88,8 @@ class AttBiLstmModel(Model):
 def build_fcnablstm(input_shape, num_classes, num_cells=8, dropout_rate=0.3, embedding_size=64):
     ip = keras.layers.Input(shape=input_shape)
 
-    x = keras.layers.Permute((2, 1))(ip)
-    x = AttBiLstmModel(num_cells=num_cells, dropout_rate=dropout_rate, ts_len=input_shape[-2], embedding_size=embedding_size)(x)
+    #x = keras.layers.Permute((2, 1))(ip)
+    x = AttBiLstmModel(num_cells=num_cells, dropout_rate=dropout_rate, ts_len=input_shape[-2], embedding_size=embedding_size)(ip)
     #x = keras.layers.Dropout(0.8)(x)
 
     y = keras.layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(ip)

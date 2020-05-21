@@ -3,8 +3,8 @@ from tensorflow import keras
 def build_fcnlstm(input_shape, num_classes, num_cells):
     ip = keras.layers.Input(shape=input_shape)
 
-    x = keras.layers.Permute((2, 1))(ip)
-    x = keras.layers.LSTM(num_cells)(x)
+    #x = keras.layers.Permute((2, 1))(ip)
+    x = keras.layers.LSTM(num_cells)(ip)
     x = keras.layers.Dropout(0.8)(x)
 
 

@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.keras import Model
 from tensorflow.keras import Input
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import LSTM
@@ -16,7 +17,7 @@ class BiLstmLayer(layers.Layer):
         bwd_lstm = LSTM(num_units, return_sequences=True, name='bwd_lstm', go_backwards=True, dropout=dropout_rate)
         self.bi_lstm = Bidirectional(layer=fwd_lstm, merge_mode='sum', backward_layer=bwd_lstm)
 
-    def __call__(self, inputs, training):
+    def call(self, inputs, training):
         outputs = self.bi_lstm(inputs, training=training)
         return outputs
 
@@ -31,7 +32,7 @@ class AttentionLayer(layers.Layer):
         super(AttentionLayer, self).build()
 
 
-    def __call__(self, inputs, training):
+    def call(self, inputs, training):
         m = tf.tanh(inputs)
         a = tf.nn.softmax(tf.tensordot(tf.transpose(self.attention_w), m, axes=1))
         r = tf.tensordot(inputs, tf.transpose(a))
@@ -39,12 +40,12 @@ class AttentionLayer(layers.Layer):
         outputs = self.dropout(outputs, training=training)
         return outputs
 
-class AttBiLstmModel(layers.Model):
+class AttBiLstmModel(Model):
     def __init__(self, num_cells, dropout_rate):
         self.bilstm_layer = BiLstmLayer(num_cells, dropout_rate)
         self.atten_layer = AttentionLayer(dropout_rate)
 
-    def __call__(self, inputs, training):
+    def call(self, inputs, training):
         x = self.bilstm_layer(inputs)
         out = self.atten_layer(x)
         return out
@@ -54,7 +55,7 @@ def build_fcnablstm(input_shape, num_classes, num_cells, dropout_rate):
     ip = keras.layers.Input(shape=input_shape)
 
     x = keras.layers.Permute((2, 1))(ip)
-    x = keras.layers.AttBiLstmModel(num_classes, num_cells, dropout_rate=0.3)(x)
+    x = AttBiLstmModel(num_cells, dropout_rate=0.3)(x)
     #x = keras.layers.Dropout(0.8)(x)
 
     y = keras.layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(ip)

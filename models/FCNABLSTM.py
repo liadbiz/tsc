@@ -42,12 +42,13 @@ class AttentionLayer(layers.Layer):
 
 class AttBiLstmModel(Model):
     def __init__(self, num_cells, dropout_rate):
+        super(AttBiLstmModel, self).__init__()
         self.bilstm_layer = BiLstmLayer(num_cells, dropout_rate)
         self.atten_layer = AttentionLayer(dropout_rate)
 
     def call(self, inputs, training):
-        x = self.bilstm_layer(inputs)
-        out = self.atten_layer(x)
+        x = self.bilstm_layer(inputs, training=training)
+        out = self.atten_layer(x, training=training)
         return out
 
 

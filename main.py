@@ -16,7 +16,7 @@ from utils.config import opt
 from models.TSCNet import TSCNet
 from models.ResNet import *
 from models.FCNLSTM import build_fcnlstm
-from model.FCNGRU import build_GRU
+from models.FCNGRU import build_fcngru
 from models.FCN import build_fcn
 from models.FCNALSTM import build_fcnalstm
 from models.FCNABLSTM import build_fcnablstm

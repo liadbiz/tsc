@@ -116,7 +116,7 @@ def train_scratch(model_name):
             x, y = build_fcnalstm(input_shape, num_classes, num_cells=8)
             model = keras.models.Model(inputs=x, outputs=y)
         elif opt.model.name == "FCNABLSTM":
-            x, y = build_fcnablstm(input_shape, num_classes, num_cells=8, dropout_rate=0.3)
+            x, y = build_fcnablstm(input_shape, num_classes, num_cells=8, dropout_rate=0.3, embedding_size=64)
             model = keras.models.Model(inputs=x, outputs=y)
         # summary model
         print('model builed!')

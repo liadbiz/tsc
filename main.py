@@ -16,9 +16,11 @@ from utils.config import opt
 from models.TSCNet import TSCNet
 from models.ResNet import *
 from models.FCNLSTM import build_fcnlstm
+from model.FCNGRU import build_GRU
 from models.FCN import build_fcn
 from models.FCNALSTM import build_fcnalstm
 from models.FCNABLSTM import build_fcnablstm
+from models.FCNABLSTM2 import build_fcnablstm2
 from utils.data_loader import load_data
 from utils.model_solver import Solver
 import argparse
@@ -112,11 +114,17 @@ def train_scratch(model_name):
         elif opt.model.name == "FCNLSTM":
             x, y = build_fcnlstm(input_shape, num_classes, num_cells=8)
             model = keras.models.Model(inputs=x, outputs=y)
+        elif opt.model.name == "FCNGRU":
+            x, y = build_fcngru(input_shape, num_classes, num_cells=8)
+            model = keras.models.Model(inputs=x, outputs=y)
         elif opt.model.name == "FCNALSTM":
             x, y = build_fcnalstm(input_shape, num_classes, num_cells=8)
             model = keras.models.Model(inputs=x, outputs=y)
         elif opt.model.name == "FCNABLSTM":
             x, y = build_fcnablstm(input_shape, num_classes, num_cells=64, dropout_rate=0.3, embedding_size=64)
+            model = keras.models.Model(inputs=x, outputs=y)
+        elif opt.model.name == "FCNABLSTM2":
+            x, y = build_fcnablstm2(input_shape, num_classes, num_cells=64, dropout_rate=0.3, embedding_size=64)
             model = keras.models.Model(inputs=x, outputs=y)
         # summary model
         print('model builed!')
